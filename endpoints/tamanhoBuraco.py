@@ -5,7 +5,7 @@ from models.models import TamanhoBuraco
 from db.database import Database
 from sqlalchemy import and_
 
-router = APIRouter("/tamanho-buraco",
+router = APIRouter(prefix="/tamanho-buraco",
                    tags=["TamanhoBuraco"],
                    responses={404: {"description": "Not Found"}})
 
@@ -13,12 +13,18 @@ database = Database()
 engine = database.get_db_connection()
 
 
-@router.post("/add", response_description="Tamanho Buraco added into the database")
+@router.post("/", response_description="Tamanho Buraco added into the database")
 async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     new_tamanho_buraco = TamanhoBuraco()
     new_tamanho_buraco.nome = tamanho_buraco_req.nome
 
     session = database.get_db_session(engine)
+
+    tamanho_buraco_existente = session.query(TamanhoBuraco).filter(
+        TamanhoBuraco.nome == new_tamanho_buraco.nome).first()
+    if tamanho_buraco_existente:
+        return Response(None, 400, "Tamanho Buraco jã existe", False)
+
     session.add(new_tamanho_buraco)
     session.flush()
 
@@ -29,10 +35,9 @@ async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     return Response(data, 201, "Tamanho Buraco cadastrado com sucesso.", False)
 
 
-@router.put("/update")
-async def update_tamanho_buraco(tamanho_buraco_update_req: TamanhoBuracoUpdateRequest):
-    tamanho_buraco_id = tamanho_buraco_update_req.tamanho_buraco_id
-    session = database.get_db_connection()
+@router.put("/{tamanho_buraco_id}")
+async def update_tamanho_buraco(tamanho_buraco_id: str, tamanho_buraco_update_req: TamanhoBuracoUpdateRequest):
+    session = database.get_db_session(engine)
 
     try:
         is_tamanho_buraco_updated = session.query(TamanhoBuraco).filter(TamanhoBuraco.id == tamanho_buraco_id).update(
@@ -55,9 +60,10 @@ async def update_tamanho_buraco(tamanho_buraco_update_req: TamanhoBuracoUpdateRe
         print("Error: ", ex)
 
 
-@router.delete("/{tamanho_buraco_id}/delete")
+@router.delete("/{tamanho_buraco_id}")
 async def delete_tamanho_buraco(tamanho_buraco_id: str):
     session = database.get_db_session(engine)
+
     try:
         is_tamanho_buraco_updated = session.query(TamanhoBuraco).filter(and_(TamanhoBuraco.id == tamanho_buraco_id, TamanhoBuraco.apagado == False)).update({
             TamanhoBuraco.apagado: True
@@ -96,5 +102,6 @@ async def read_tamanho_buraco(tamanho_buraco_id: str):
 @router.get("/")
 async def read_all_tamanho_buraco():
     session = database.get_db_session(engine)
-    data = session.query(TamanhoBuraco).all()
+    data = session.query(TamanhoBuraco).filter(
+        TamanhoBuraco.apagado == False).all()
     return Response(data, 200, "", False)

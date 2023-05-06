@@ -1,0 +1,384 @@
+{
+	"info": {
+		"_postman_id": "e5c2ae83-6182-4a11-b6f6-6882f4a3c49a",
+		"name": "buraco",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11955653"
+	},
+	"item": [
+		{
+			"name": "Tamanho Buraco",
+			"item": [
+				{
+					"name": "Tamanho Buraco",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tamanho Buraco By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tamanho Buraco",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Pequeno\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tamanho Buraco",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco/4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tamanho Buraco",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco/4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuário",
+			"item": [
+				{
+					"name": "Usuário",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/usuario",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuário By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/usuario/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuário",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Pequeno\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/tamanho-buraco",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tamanho-buraco"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuário",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nomeUsuario\": \"admin2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/usuario/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuário",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/usuario/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Buraco",
+			"item": [
+				{
+					"name": "Buraco",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/usuario",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buraco By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/buraco/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buraco",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buraco",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"latitude\": \"1\",\r\n    \"longitude\": \"2\",\r\n    \"tamanho_buraco_id\": 1,\r\n    \"usuario_id\": 2,\r\n    \"votos\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/buraco",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buraco"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buraco",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tamanho_buraco_id\": 1,\r\n    \"votos\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/buraco/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buraco",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buraco",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/buraco/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buraco",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -19,6 +19,7 @@ class Usuario(Base):
     email = Column(String(150), nullable=False)
     senha = Column(String(50), nullable=False)
     ativo = Column(BOOLEAN)
+    apagado = Column(BOOLEAN, default=False)
 
 
 class Buraco(Base):
@@ -26,9 +27,11 @@ class Buraco(Base):
     id = Column(INTEGER, primary_key=True)
     latitude = Column(String, nullable=False)
     longitude = Column(String, nullable=False)
-    idTamanhoBuraco = Column(INTEGER, ForeignKey("tamanhoBuraco.id") nullable=False)
+    idTamanhoBuraco = Column(INTEGER, ForeignKey(
+        "tamanhoBuraco.id"), nullable=False)
     idUsuario = Column(INTEGER, ForeignKey("usuario.id"))
+    votos = Column(INTEGER, default=0)
     apagado = Column(BOOLEAN, default=False)
 
-    tamanhoBuraco = relationship("tamanhoBuraco", backref="buraco")
-    usuario = relationship("usuario", backref="buraco")
+    tamanhoBuraco = relationship("TamanhoBuraco", backref="buraco")
+    usuario = relationship("Usuario", backref="buraco")
