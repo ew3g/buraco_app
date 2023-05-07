@@ -13,7 +13,13 @@
 					"name": "Tamanho Buraco",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW5AYWRtaW4uY29tIiwiZXhwaXJlcyI6MTY4MzUwMjAzMi44NTM4NzA5fQ.HV0CjPVLpXvHn5YR_lkwBH9Ppt2T3Icek1joRujZqLI",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "localhost:8080/tamanho-buraco",
 							"host": [
@@ -33,13 +39,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/tamanho-buraco",
+							"raw": "localhost:8080/tamanho-buraco/1",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
-								"tamanho-buraco"
+								"tamanho-buraco",
+								"1"
 							]
 						}
 					},
@@ -155,16 +162,22 @@
 					"name": "Usuário By Id",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW5AYWRtaW4uY29tIiwiZXhwaXJlcyI6MTY4MzUwMjAzMi44NTM4NzA5fQ.HV0CjPVLpXvHn5YR_lkwBH9Ppt2T3Icek1joRujZqLI",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "localhost:8080/usuario/1",
+							"raw": "localhost:8080/usuario/2",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"usuario",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -177,7 +190,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Pequeno\"\r\n}",
+							"raw": "{\r\n    \"nome_usuario\": \"admin2\",\r\n    \"email\": \"admin@admin.com\",\r\n    \"senha\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -185,13 +198,13 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/tamanho-buraco",
+							"raw": "localhost:8080/usuario",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
-								"tamanho-buraco"
+								"usuario"
 							]
 						}
 					},
@@ -204,7 +217,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nomeUsuario\": \"admin2\"\r\n}",
+							"raw": "{\r\n    \"senha\": \"admin2\",\r\n    \"ativo\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -240,14 +253,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/usuario/3",
+							"raw": "localhost:8080/usuario/1",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"usuario",
-								"3"
+								"1"
 							]
 						}
 					},
@@ -264,13 +277,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/usuario",
+							"raw": "localhost:8080/buraco",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
-								"usuario"
+								"buraco"
 							]
 						}
 					},
@@ -373,6 +386,38 @@
 							"path": [
 								"buraco",
 								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Auth",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@admin.com\",\r\n    \"senha\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/auth",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth"
 							]
 						}
 					},

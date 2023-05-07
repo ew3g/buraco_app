@@ -1,27 +1,38 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from models.request import TamanhoBuracoRequest, TamanhoBuracoUpdateRequest
 from models.response import Response
 from models.models import TamanhoBuraco
 from db.database import Database
 from sqlalchemy import and_
+from auth.auth_bearer import JWTBearer
 
-router = APIRouter(prefix="/tamanho-buraco",
-                   tags=["TamanhoBuraco"],
-                   responses={404: {"description": "Not Found"}})
+
+router = APIRouter(
+    prefix="/tamanho-buraco",
+    tags=["TamanhoBuraco"],
+    responses={404: {"description": "Not Found"}},
+)
 
 database = Database()
 engine = database.get_db_connection()
 
 
-@router.post("/", response_description="Tamanho Buraco added into the database")
+@router.post(
+    "/",
+    response_description="Tamanho Buraco added into the database",
+    dependencies=[Depends(JWTBearer())],
+)
 async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     new_tamanho_buraco = TamanhoBuraco()
     new_tamanho_buraco.nome = tamanho_buraco_req.nome
 
     session = database.get_db_session(engine)
 
-    tamanho_buraco_existente = session.query(TamanhoBuraco).filter(
-        TamanhoBuraco.nome == new_tamanho_buraco.nome).first()
+    tamanho_buraco_existente = (
+        session.query(TamanhoBuraco)
+        .filter(TamanhoBuraco.nome == new_tamanho_buraco.nome)
+        .first()
+    )
     if tamanho_buraco_existente:
         return Response(None, 400, "Tamanho Buraco jã existe", False)
 
@@ -35,24 +46,37 @@ async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     return Response(data, 201, "Tamanho Buraco cadastrado com sucesso.", False)
 
 
-@router.put("/{tamanho_buraco_id}")
-async def update_tamanho_buraco(tamanho_buraco_id: str, tamanho_buraco_update_req: TamanhoBuracoUpdateRequest):
+@router.put("/{tamanho_buraco_id}", dependencies=[Depends(JWTBearer())])
+async def update_tamanho_buraco(
+    tamanho_buraco_id: str, tamanho_buraco_update_req: TamanhoBuracoUpdateRequest
+):
     session = database.get_db_session(engine)
 
     try:
-        is_tamanho_buraco_updated = session.query(TamanhoBuraco).filter(TamanhoBuraco.id == tamanho_buraco_id).update(
-            {TamanhoBuraco.nome: tamanho_buraco_update_req.nome}, synchronize_session=False)
+        is_tamanho_buraco_updated = (
+            session.query(TamanhoBuraco)
+            .filter(TamanhoBuraco.id == tamanho_buraco_id)
+            .update(
+                {TamanhoBuraco.nome: tamanho_buraco_update_req.nome},
+                synchronize_session=False,
+            )
+        )
         session.flush()
         session.commit()
         response_msg = "Tamanho Buraco atualizado com sucesso."
         response_code = 204
         error = False
         if is_tamanho_buraco_updated == 1:
-            data = session.query(TamanhoBuraco).filter(
-                TamanhoBuraco.id == tamanho_buraco_id).one()
+            data = (
+                session.query(TamanhoBuraco)
+                .filter(TamanhoBuraco.id == tamanho_buraco_id)
+                .one()
+            )
         elif is_tamanho_buraco_updated == 0:
-            response_msg = "Tamanho Produto não atualizado. Nenhum Tamanho Buraco encontrado com o id: " + \
-                str(tamanho_buraco_id)
+            response_msg = (
+                "Tamanho Produto não atualizado. Nenhum Tamanho Buraco encontrado com o id: "
+                + str(tamanho_buraco_id)
+            )
             error = True
             data = None
         return Response(data, response_code, response_msg, error)
@@ -60,14 +84,21 @@ async def update_tamanho_buraco(tamanho_buraco_id: str, tamanho_buraco_update_re
         print("Error: ", ex)
 
 
-@router.delete("/{tamanho_buraco_id}")
+@router.delete("/{tamanho_buraco_id}", dependencies=[Depends(JWTBearer())])
 async def delete_tamanho_buraco(tamanho_buraco_id: str):
     session = database.get_db_session(engine)
 
     try:
-        is_tamanho_buraco_updated = session.query(TamanhoBuraco).filter(and_(TamanhoBuraco.id == tamanho_buraco_id, TamanhoBuraco.apagado == False)).update({
-            TamanhoBuraco.apagado: True
-        }, synchronize_session=False)
+        is_tamanho_buraco_updated = (
+            session.query(TamanhoBuraco)
+            .filter(
+                and_(
+                    TamanhoBuraco.id == tamanho_buraco_id,
+                    TamanhoBuraco.apagado == False,
+                )
+            )
+            .update({TamanhoBuraco.apagado: True}, synchronize_session=False)
+        )
         session.flush()
         session.commit()
         response_msg = "Tamanho Buraco apagado com sucesso"
@@ -75,8 +106,10 @@ async def delete_tamanho_buraco(tamanho_buraco_id: str):
         error = False
         data = {"tamanho_buraco_id": tamanho_buraco_id}
         if is_tamanho_buraco_updated == 0:
-            response_msg = "Tamanho Buraco não apagado. Nenhum Tamanho Buraco encontrado com o id: " + \
-                str(tamanho_buraco_id)
+            response_msg = (
+                "Tamanho Buraco não apagado. Nenhum Tamanho Buraco encontrado com o id: "
+                + str(tamanho_buraco_id)
+            )
             error = True
             data = None
         return Response(data, response_code, response_msg, error)
@@ -84,14 +117,22 @@ async def delete_tamanho_buraco(tamanho_buraco_id: str):
         print("Error: ", ex)
 
 
-@router.get("/{tamanho_buraco_id}")
+@router.get("/{tamanho_buraco_id}", dependencies=[Depends(JWTBearer())])
 async def read_tamanho_buraco(tamanho_buraco_id: str):
     session = database.get_db_session(engine)
     response_msg = "Tamanho Buraco encontrado com sucesso"
     data = None
     try:
-        data = session.query(TamanhoBuraco).filter(and_(
-            TamanhoBuraco.id == tamanho_buraco_id, TamanhoBuraco.apagado == False)).one()
+        data = (
+            session.query(TamanhoBuraco)
+            .filter(
+                and_(
+                    TamanhoBuraco.id == tamanho_buraco_id,
+                    TamanhoBuraco.apagado == False,
+                )
+            )
+            .one()
+        )
     except Exception as ex:
         print("Error", ex)
         response_msg = "TamanhoBuraco não encontrado"
@@ -99,9 +140,8 @@ async def read_tamanho_buraco(tamanho_buraco_id: str):
     return Response(data, 200, response_msg, error)
 
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(JWTBearer())])
 async def read_all_tamanho_buraco():
     session = database.get_db_session(engine)
-    data = session.query(TamanhoBuraco).filter(
-        TamanhoBuraco.apagado == False).all()
+    data = session.query(TamanhoBuraco).filter(TamanhoBuraco.apagado == False).all()
     return Response(data, 200, "", False)

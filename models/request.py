@@ -36,3 +36,8 @@ class BuracoUpdateRequest(BaseModel):
     tamanho_buraco_id: int = Field(None, title="Buraco Tamanho")
     usuario_id: int = Field(None, title="Buraco Usuário")
     votos: int = Field(None, title="Votos")
+
+
+class AuthRequest(BaseModel):
+    email: EmailStr = Field(None, title="Usuário Email")
+    senha: str = Field(None, title="Usuário Senha")
