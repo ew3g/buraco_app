@@ -1,0 +1,683 @@
+Claro, vou fornecer um exemplo de projeto em React que usa autenticação com token e consome uma API RESTful que lida com recursos de "Buraco", "tamanhoBuraco" e "Usuário". Este exemplo incluirá as operações básicas CRUD (Create, Read, Update e Delete) para cada um desses recursos.
+
+Antes de começar, vamos definir algumas coisas:
+
+- Vamos usar o framework React para construir o front-end da nossa aplicação.
+- Vamos usar o Axios para fazer requisições HTTP para a API.
+- Vamos armazenar o token de autenticação no localStorage do navegador.
+
+Agora vamos criar a estrutura básica do projeto. Abra um terminal e execute os seguintes comandos:
+
+```
+npx create-react-app react-app
+cd react-app
+npm start
+```
+
+Isso criará um novo projeto React na pasta "react-app" e iniciará um servidor de desenvolvimento. Abra o navegador em http://localhost:3000 para ver a aplicação funcionando.
+
+Agora, vamos instalar o Axios e outras dependências necessárias. No terminal, execute o seguinte comando:
+
+```
+npm install axios react-router-dom react-bootstrap react-bootstrap-icons jwt-decode
+```
+
+O Axios é a biblioteca que usaremos para fazer as requisições HTTP para a API. O react-router-dom será usado para navegar entre as diferentes páginas da nossa aplicação. O react-bootstrap e react-bootstrap-icons serão usados para estilizar a nossa aplicação. O jwt-decode será usado para decodificar o token de autenticação.
+
+Agora vamos criar a estrutura de pastas do projeto. No diretório src, crie as seguintes pastas:
+
+- components: contém os componentes reutilizáveis da aplicação
+- pages: contém as páginas da aplicação
+- api: contém os arquivos relacionados à API (configuração do Axios, funções para fazer as requisições, etc.)
+- utils: contém arquivos com funções auxiliares (como uma função para decodificar o token de autenticação)
+
+Agora vamos configurar o Axios para enviar o token de autenticação em todas as requisições. No arquivo api/axiosConfig.js, adicione o seguinte código:
+
+```
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3001/api',
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+Esse código configura o Axios para enviar o token de autenticação em todas as requisições, se o token estiver disponível no localStorage do navegador.
+
+Agora vamos criar as funções para fazer as requisições HTTP para a API. No arquivo api/buracos.js, adicione o seguinte código:
+```
+import api from './axiosConfig';
+
+export const getBuracos = async () => {
+  const response = await api.get('/buracos');
+  return response.data;
+};
+
+export const createBuraco = async (data) => {
+  const response = await api.post('/buracos', data);
+  return response.data;
+};
+
+export const updateBuraco = async (id, data) => {
+  const response = await api.put(`/buracos/${id}`, data);
+  return response.data;
+};
+
+export const deleteBuraco = async (id) => {
+  const response = await api.delete(`/buracos/${id}`);
+  return response.data;
+};
+```
+
+Essas funções usam o Axios para fazer requisições HTTP para a API. A função getBuracos faz uma requisição GET para a URL "/buracos" e retorna os dados recebidos. As funções createBuraco, updateBuraco e deleteBuraco fazem requisições POST, PUT e DELETE para as URLs "/buracos", "/buracos/:id" e "/buracos/:id", respectivamente, e retornam os dados recebidos.
+
+Agora vamos criar as funções para fazer as requisições HTTP para a API para os recursos de "tamanhoBuraco" e "Usuário". No arquivo api/tamanhosBuraco.js, adicione o seguinte código:
+
+```
+import api from './axiosConfig';
+
+export const getTamanhosBuraco = async () => {
+  const response = await api.get('/tamanhosBuraco');
+  return response.data;
+};
+
+export const createTamanhoBuraco = async (data) => {
+  const response = await api.post('/tamanhosBuraco', data);
+  return response.data;
+};
+
+export const updateTamanhoBuraco = async (id, data) => {
+  const response = await api.put(`/tamanhosBuraco/${id}`, data);
+  return response.data;
+};
+
+export const deleteTamanhoBuraco = async (id) => {
+  const response = await api.delete(`/tamanhosBuraco/${id}`);
+  return response.data;
+};
+```
+
+E no arquivo api/usuarios.js, adicione o seguinte código:
+
+```
+import api from './axiosConfig';
+
+export const getUsuarios = async () => {
+  const response = await api.get('/usuarios');
+  return response.data;
+};
+
+export const createUsuario = async (data) => {
+  const response = await api.post('/usuarios', data);
+  return response.data;
+};
+
+export const updateUsuario = async (id, data) => {
+  const response = await api.put(`/usuarios/${id}`, data);
+  return response.data;
+};
+
+export const deleteUsuario = async (id) => {
+  const response = await api.delete(`/usuarios/${id}`);
+  return response.data;
+};
+```
+
+Agora que as funções para fazer as requisições HTTP para a API estão criadas, vamos criar os componentes e páginas da aplicação.
+
+Primeiro, vamos criar o componente Navbar, que será a barra de navegação da aplicação. No arquivo components/Navbar.js, adicione o seguinte código:
+
+```
+import React from 'react';
+import { Navbar, Nav } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+
+const AppNavbar = () => {
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.reload();
+  };
+
+  return (
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar.Brand>Minha Aplicação</Navbar.Brand>
+      <Navbar.Toggle aria-controls="...app-navbar-collapse" />
+      Desculpe, parece que minha resposta foi truncada novamente. Aqui está a continuação:
+
+```
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="ml-auto">
+          <LinkContainer to="/buracos">
+            <Nav.Link>Buracos</Nav.Link>
+          </LinkContainer>
+          <LinkContainer to="/tamanhos-buraco">
+            <Nav.Link>Tamanhos de Buraco</Nav.Link>
+          </LinkContainer>
+          <LinkContainer to="/usuarios">
+            <Nav.Link>Usuários</Nav.Link>
+          </LinkContainer>
+          <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
+  );
+};
+
+export default AppNavbar;
+```
+
+Este componente cria uma barra de navegação usando o React Bootstrap e o pacote react-router-bootstrap para criar os links de navegação. Também há um botão "Logout" que limpa o token de autenticação armazenado no localStorage e recarrega a página.
+
+Agora vamos criar as páginas da aplicação. Primeiro, a página para listar os buracos. No arquivo pages/BuracosList.js, adicione o seguinte código:
+
+```
+import React, { useState, useEffect } from 'react';
+import { Table } from 'react-bootstrap';
+import { getBuracos } from '../api/buracos';
+
+const BuracosList = () => {
+  const [buracos, setBuracos] = useState([]);
+
+  useEffect(() => {
+    const fetchBuracos = async () => {
+      const data = await getBuracos();
+      setBuracos(data);
+    };
+    fetchBuracos();
+  }, []);
+
+  return (
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tamanho</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+        </tr>
+      </thead>
+      <tbody>
+        {buracos.map((buraco) => (
+          <tr key={buraco.id}>
+            <td>{buraco.id}</td>
+            <td>{buraco.tamanhoBuraco}</td>
+            <td>{buraco.latitude}</td>
+            <td>{buraco.longitude}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+export default BuracosList;
+```
+
+Este componente usa o estado e o efeito do React para buscar os buracos da API e exibi-los em uma tabela.
+
+Agora vamos criar a página para adicionar/editar buracos. No arquivo pages/BuracoForm.js, adicione o seguinte código:
+
+```
+import React, { useState, useEffect } from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { useHistory, useParams } from 'react-router-dom';
+import { createBuraco, getBuracoById, updateBuraco } from '../api/buracos';
+import { getTamanhosBuraco } from '../api/tamanhosBuraco';
+
+const BuracoForm = () => {
+  const history = useHistory();
+  const { id } = useParams();
+  const isAddMode = !id;
+  const [buraco, setBuraco] = useState({
+    tamanhoBuraco: '',
+    latitude: '',
+    longitude: '',
+  });
+  const [tamanhosBuraco, setTamanhosBuraco] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const fetchTamanhosBuraco = async () => {
+      const data = await getTamanhosBuraco();
+      setTamanhosBuraco(data);
+
+    <Form.Group controlId="formTamanhoBuraco">
+      <Form.Label>Tamanho do Buraco</Form.Label>
+      <Form.Control
+        as="select"
+        value={buraco.tamanhoBuraco}
+        onChange={handleChange}
+        name="tamanhoBuraco"
+        required
+      >
+        <option value="" disabled>
+          Selecione um tamanho
+        </option>
+        {tamanhosBuraco.map((tamanho) => (
+          <option key={tamanho.id} value={tamanho.id}>
+            {tamanho.descricao}
+          </option>
+        ))}
+      </Form.Control>
+    </Form.Group>
+    <Form.Group controlId="formLatitude">
+      <Form.Label>Latitude</Form.Label>
+      <Form.Control
+        type="number"
+        placeholder="Digite a latitude"
+        value={buraco.latitude}
+        onChange={handleChange}
+        name="latitude"
+        required
+      />
+    </Form.Group>
+    <Form.Group controlId="formLongitude">
+      <Form.Label>Longitude</Form.Label>
+      <Form.Control
+        type="number"
+        placeholder="Digite a longitude"
+        value={buraco.longitude}
+        onChange={handleChange}
+        name="longitude"
+        required
+      />
+    </Form.Group>
+    <Button variant="primary" type="submit">
+      {isAddMode ? 'Adicionar' : 'Editar'}
+    </Button>
+  </Form>
+  );
+};
+
+export default BuracoForm;
+```
+
+Este componente renderiza um formulário que permite criar/editar um buraco. Quando o usuário clica no botão "Adicionar" ou "Editar", o formulário é submetido e a função handleSubmit é executada.
+
+Por fim, vamos criar a página para listar os usuários. No arquivo pages/UsuariosList.js, adicione o seguinte código:
+
+```
+import React, { useState, useEffect } from 'react';
+import { Table } from 'react-bootstrap';
+import { getUsuarios } from '../api/usuarios';
+
+const UsuariosList = () => {
+  const [usuarios, setUsuarios] = useState([]);
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      const data = await getUsuarios();
+      setUsuarios(data);
+    };
+    fetchUsuarios();
+  }, []);
+
+  return (
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {usuarios.map((usuario) => (
+          <tr key={usuario.id}>
+            <td>{usuario.id}</td>
+            <td>{usuario.nome}</td>
+            <td>{usuario.email}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+export default UsuariosList;
+```
+
+Este componente é semelhante ao BuracosList, mas exibe os usuários em vez dos buracos.
+
+Agora que temos todas as páginas, vamos criar as rotas para elas. No arquivo App.js, adicione o seguinte código:
+
+```
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+import AppNavbar from './components/AppNavbar';
+import BuracosList from './pages/BuracosList';
+import BuracoForm from './pages/BuracoForm';
+import TamanhosBuracoList from './pages/TamanhosBuracoList';
+import UsuariosList from './pages/UsuariosList';
+import LoginPage from './pages/LoginPage;
+
+Desculpe, parece que a minha resposta está sendo truncada novamente. Vamos continuar:
+
+```
+const App = () => {
+  return (
+    <Router>
+      <div>
+        <AppNavbar />
+        <Switch>
+          <Route exact path="/" component={BuracosList} />
+          <Route exact path="/buracos" component={BuracosList} />
+          <Route exact path="/buracos/adicionar" component={BuracoForm} />
+          <Route exact path="/buracos/editar/:id" component={BuracoForm} />
+          <Route exact path="/tamanhos-buraco" component={TamanhosBuracoList} />
+          <Route exact path="/usuarios" component={UsuariosList} />
+          <Route exact path="/login" component={LoginPage} />
+        </Switch>
+      </div>
+    </Router>
+  );
+};
+
+export default App;
+```
+
+Este componente define as rotas para todas as páginas que criamos. Agora podemos navegar entre elas usando os links da barra de navegação.
+
+Por fim, vamos adicionar a lógica de autenticação. Para isso, vamos criar um contexto de autenticação que armazena o token de acesso e fornece funções para fazer login e logout. No arquivo AuthContext.js, adicione o seguinte código:
+
+```
+import React, { createContext, useState } from 'react';
+
+const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    setToken(token);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ token, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export { AuthContext, AuthProvider };
+```
+
+Este componente define o contexto de autenticação com duas funções: login e logout. A função login armazena o token de acesso no armazenamento local do navegador e atualiza o estado do token. A função logout remove o token do armazenamento local e atualiza o estado do token.
+
+Agora podemos usar o contexto de autenticação em nossas páginas. No arquivo LoginPage.js, adicione o seguinte código:
+
+```
+import React, { useContext, useState } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
+import { login } from '../api/auth';
+import { AuthContext } from '../AuthContext';
+
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState(null);
+
+  const { login } = useContext(AuthContext);
+  const history = useHistory();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = await login(email, senha);
+      history.push('/');
+    } catch (err) {
+      setErro(err.message);
+    }
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <h1>Login</h1>
+      {erro && <p>{erro}</p>}
+      <Form.Group controlId="formEmail">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          placeholder="Digite o email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </Form.Group>
+      <Form.Group controlId="formSenha">
+        <Form.Label>Senha</Form.Label>
+        Desculpe novamente pela interrupção. Vamos continuar com a resposta:
+
+```
+        <Form.Control
+          type="password"
+          placeholder="Digite a senha"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          required
+        />
+      </Form.Group>
+      <Button variant="primary" type="submit">
+        Login
+      </Button>
+    </Form>
+  );
+};
+
+export default LoginPage;
+```
+
+Este componente define um formulário de login que captura o email e a senha do usuário. Quando o formulário é enviado, a função handleSubmit chama a função login do contexto de autenticação para autenticar o usuário. Se a autenticação for bem-sucedida, o usuário é redirecionado para a página principal.
+
+Por fim, precisamos atualizar as funções de API para incluir o token de autenticação em todas as solicitações. No arquivo api.js, adicione o seguinte código:
+
+```
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:3000';
+
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+Este código adiciona um interceptor à instância do axios que adiciona o token de autenticação em todas as solicitações. O token é obtido do armazenamento local do navegador.
+
+Com isso, concluímos o projeto. Ele inclui a criação de um aplicativo React com roteamento, consumo de API com token de autenticação e um contexto de autenticação. É claro que ainda há muitas melhorias que poderiam ser feitas, como validação de formulários, tratamento de erros mais sofisticado e proteção de rotas privadas. Mas espero que este projeto tenha sido útil para você.
+
+
+
+
+
+
+
+
+
+Claro! Para adicionar um marcador que representa um buraco no mapa quando o usuário clica na região central de Guarulhos, podemos usar a biblioteca React-Leaflet, que é uma wrapper da biblioteca Leaflet para React. Primeiro, precisamos instalar as dependências:
+
+```
+npm install react-leaflet leaflet
+```
+
+Em seguida, vamos criar um componente Mapa que renderiza o mapa e lida com o evento de clique para adicionar o marcador. Aqui está o código:
+
+```
+import React, { useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+const Mapa = () => {
+  const [marcador, setMarcador] = useState(null);
+
+  const handleClick = (event) => {
+    const { lat, lng } = event.latlng;
+    setMarcador({ lat, lng });
+  };
+
+  return (
+    <MapContainer
+      center={[-23.455, -46.533]}
+      zoom={15}
+      scrollWheelZoom={false}
+      style={{ height: "500px", width: "100%" }}
+      onclick={handleClick}
+    >
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      {marcador && (
+        <Marker position={[marcador.lat, marcador.lng]}>
+          <Popup>Um buraco aqui</Popup>
+        </Marker>
+      )}
+    </MapContainer>
+  );
+};
+
+export default Mapa;
+```
+
+Este componente define um estado para armazenar a posição do marcador. Quando o usuário clica no mapa, a função handleClick é chamada e define a posição do marcador no estado.
+
+O componente MapContainer é o contêiner principal do mapa. Ele renderiza uma camada de azulejos de OpenStreetMap e um marcador, se houver um no estado.
+
+O evento de clique é definido com a propriedade onclick no MapContainer. Quando o usuário clica no mapa, a função handleClick é chamada com um objeto de evento contendo a posição do clique. O marcador é atualizado no estado com a posição do clique.
+
+Se houver um marcador no estado, ele é renderizado como um Marker com uma caixa de diálogo de popup que diz "Um buraco aqui". Claro, isso é apenas um exemplo; em um aplicativo real, você usaria as informações do buraco da API para exibir uma descrição mais precisa.
+
+Para usar este componente em seu aplicativo, basta importá-lo e renderizá-lo em sua árvore de componentes.
+
+```
+import React from "react";
+import Mapa from "./Mapa";
+
+const App = () => {
+  return (
+    <div>
+      <h1>Mapa de buracos em Guarulhos</h1>
+      <Mapa />
+    </div>
+  );
+};
+
+export default App;
+```
+
+Este componente simplesmente rendereiza o componente Mapa e um título. Quando o usuário clica no mapa, o marcador é adicionado na posição do clique.
+
+Espero que isso ajude!
+
+
+
+
+
+
+
+Claro! Para obter uma lista de buracos com latitude e longitude de uma API e marcá-los em um mapa usando React, podemos usar a biblioteca React-Leaflet, que é uma wrapper da biblioteca Leaflet para React. Aqui está um exemplo:
+
+Primeiro, precisamos instalar as dependências:
+
+```
+npm install react-leaflet leaflet
+```
+
+Em seguida, vamos criar um componente Mapa que renderiza o mapa e faz uma chamada à API para obter a lista de buracos. Aqui está o código:
+
+```
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+const Mapa = () => {
+  const [buracos, setBuracos] = useState([]);
+
+  useEffect(() => {
+    const fetchBuracos = async () => {
+      const response = await fetch("https://sua-api.com/buracos");
+      const data = await response.json();
+      setBuracos(data);
+    };
+    fetchBuracos();
+  }, []);
+
+  return (
+    <MapContainer
+      center={[-23.455, -46.533]}
+      zoom={15}
+      scrollWheelZoom={false}
+      style={{ height: "500px", width: "100%" }}
+    >
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      {buracos.map((buraco) => (
+        <Marker position={[buraco.lat, buraco.lng]}>
+          <Popup>{buraco.descricao}</Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+};
+
+export default Mapa;
+```
+
+Este componente define um estado para armazenar a lista de buracos. Usando o useEffect, ele faz uma chamada à API para obter a lista de buracos e atualiza o estado com os dados recebidos.
+
+O componente MapContainer é o contêiner principal do mapa. Ele renderiza uma camada de azulejos de OpenStreetMap e um marcador para cada buraco na lista.
+
+O método map é usado para percorrer a lista de buracos e renderizar um marcador para cada um deles. Cada marcador é renderizado como um Marker com uma caixa de diálogo de popup que exibe a descrição do buraco.
+
+Para usar este componente em seu aplicativo, basta importá-lo e renderizá-lo em sua árvore de componentes.
+
+```
+import React from "react";
+import Mapa from "./Mapa";
+
+const App = () => {
+  return (
+    <div>
+      <h1>Mapa de buracos em Guarulhos</h1>
+      <Mapa />
+    </div>
+  );
+};
+
+export default App;
+```
+
+Este componente simplesmente rendereiza o componente Mapa e um título. O componente Mapa faz uma chamada à API e renderiza os buracos em um mapa.
+
+Espero que isso ajude!
