@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from models.request import BuracoRequest, BuracoUpdateRequest
-from models.response import Response
+from models.response import Response, BuracoResponse, BuracoListResponse
 from models.models import Buraco
 from db.database import Database
 from sqlalchemy import and_
@@ -126,4 +126,39 @@ async def read_buraco(buraco_id: str):
 async def read_all_buraco():
     session = database.get_db_session(engine)
     data = session.query(Buraco).filter(Buraco.apagado == False).all()
-    return Response(data, 200, "", False)
+    return BuracoListResponse(data)
+
+
+@router.post("/{buraco_id}", dependencies=[Depends(JWTBearer())])
+async def votar_buraco(buraco_id: str):
+    session = database.get_db_session(engine)
+
+    try:
+        is_buraco_updated = (
+            session.query(Buraco)
+            .filter(Buraco.id == buraco_id)
+            .update(
+                {
+                    Buraco.votos: Buraco.votos + 1,
+                },
+                synchronize_session=False,
+            )
+        )
+
+        session.flush()
+        session.commit()
+        response_msg = "Buraco atualizado com sucesso."
+        response_code = 204
+        error = False
+        if is_buraco_updated == 1:
+            data = session.query(Buraco).filter(Buraco.id == buraco_id).one()
+        elif is_buraco_updated == 0:
+            response_msg = (
+                "Buraco não atualizado. Nenhum Buraco encontrado com o id: "
+                + str(buraco_id)
+            )
+            error = True
+            data = None
+        return Response(data, response_code, response_msg, error)
+    except Exception as ex:
+        print("Error: ", ex)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table } from 'react-bootstrap';
-import { getUsuarios } from '../api/usuarios';
+import { getUsuarios } from '../api/usuario';
 
 const UsuariosList = () => {
     const [usuarios, setUsuarios] = useState([]);

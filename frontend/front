@@ -1,4 +1,4 @@
-Claro, vou fornecer um exemplo de projeto em React que usa autenticação com token e consome uma API RESTful que lida com recursos de "Buraco", "tamanhoBuraco" e "Usuário". Este exemplo incluirá as operações básicas CRUD (Create, Read, Update e Delete) para cada um desses recursos.
+Claro, vou fornecer um exemplo de projeto em React que usa autenticação com token e consome uma API RESTful que lida com recursos de "Buraco", "1" e "Usuário". Este exemplo incluirá as operações básicas CRUD (Create, Read, Update e Delete) para cada um desses recursos.
 
 Antes de começar, vamos definir algumas coisas:
 

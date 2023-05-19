@@ -25,6 +25,7 @@ engine = database.get_db_connection()
 async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     new_tamanho_buraco = TamanhoBuraco()
     new_tamanho_buraco.nome = tamanho_buraco_req.nome
+    new_tamanho_buraco.cor = tamanho_buraco_req.cor
 
     session = database.get_db_session(engine)
 
@@ -34,7 +35,7 @@ async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
         .first()
     )
     if tamanho_buraco_existente:
-        return Response(None, 400, "Tamanho Buraco jã existe", False)
+        return Response(None, 400, "Tamanho Buraco já existe", False)
 
     session.add(new_tamanho_buraco)
     session.flush()

@@ -2,35 +2,23 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import AppNavbar from './components/Navbar';
-import BuracosList from './pages/BuracosList';
-import BuracoForm from './pages/BuracoForm';
-import TamanhosBuracoList from './pages/TamanhosBuracoList';
-import UsuariosList from './pages/UsuariosList';
-import LoginPage from './pages/LoginPage';
-import Mapa from './components/Mapa';
-
+import Profile from './components/Profile'
+import Login from './components/Login';
+import EsqueciSenha from './components/EsqueciSenha';
+import Home from './components/Home';
 
 const App = () => {
   return (
-    <Router>
-      <div>
-        <AppNavbar />
+    <div>
+      <Router>
         <Routes>
-          <Route exact path="/" component={BuracosList} />
-          <Route exact path="/buracos" component={BuracosList} />
-          <Route exact path="/buracos/adicionar" component={BuracoForm} />
-          <Route exact path="/buracos/editar/:id" component={BuracoForm} />
-          <Route exact path="/tamanhos-buraco" component={TamanhosBuracoList} />
-          <Route exact path="/usuarios" component={UsuariosList} />
-          <Route exact path="/login" component={LoginPage} />
+          <Route exact path="/" element={<Login />} />
+          <Route exact path="/home" element={<Home />} />
+          <Route exact path="/perfil" element={<Profile />} />
+          <Route exact path="/esqueci-senha" element={<EsqueciSenha />} />
         </Routes>
-        <Mapa />
-      </div>
-    </Router>
-
-
-
+      </Router>
+    </div>
   );
 };
 

@@ -1,22 +1,22 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
-import { login } from '../api/auth';
-import { AuthContext } from '../AuthContext';
+import { useNavigate } from 'react-router-dom';
+//import { login } from '../api/auth';
+//import { AuthContext } from '../AuthContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [erro, setErro] = useState(null);
 
-    const { login } = useContext(AuthContext);
-    const history = useHistory();
+    //const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = await login(email, senha);
-            history.push('/');
+            //const token = await login(email, senha);
+            navigate.navigate('/')
         } catch (err) {
             setErro(err.message);
         }

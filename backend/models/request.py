@@ -4,10 +4,12 @@ from typing import Optional
 
 class TamanhoBuracoRequest(BaseModel):
     nome: str = Field(None, title="Tamanho Buraco Nome", max_length=50)
+    cor: str = Field(None, title="Tamanho Buraco Cor", max_length=50)
 
 
 class TamanhoBuracoUpdateRequest(BaseModel):
     nome: str = Field(None, title="Tamanho Buraco Nome", max_length=50)
+    cor: str = Field(None, title="Tamanho Buraco Cor", max_length=50)
 
 
 class UsuarioRequest(BaseModel):

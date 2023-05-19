@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from models.request import UsuarioRequest, UsuarioUpdateRequest
-from models.response import Response
+from models.response import Response, UserResponse
 from models.models import Usuario
 from db.database import Database
 from sqlalchemy import and_
@@ -14,11 +14,7 @@ database = Database()
 engine = database.get_db_connection()
 
 
-@router.post(
-    "/",
-    response_description="Usuario added into the database",
-    dependencies=[Depends(JWTBearer())],
-)
+@router.post("/", response_description="Usuario added into the database",)
 async def add_usuario(usuario_req: UsuarioRequest):
     new_usuario = Usuario()
     new_usuario.email = usuario_req.email
@@ -125,7 +121,7 @@ async def read_usuario(usuario_id: str):
         print("Error", ex)
         response_msg = "Usuario não encontrado"
     error = False
-    return Response(data, 200, response_msg, error)
+    return UserResponse(data)
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])

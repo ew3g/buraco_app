@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from models.request import AuthRequest
-from models.response import Response
+from models.response import AuthResponse
 from models.models import Usuario
 from db.database import Database
 from sqlalchemy import and_
@@ -18,11 +18,10 @@ engine = database.get_db_connection()
 @router.post("/", response_description="Usuário autenticado com sucesso")
 async def post_auth(auth_req: AuthRequest):
     session = database.get_db_session(engine)
-    token = None
+    data = None
     code = None
+    usuario = None
     try:
-        print(auth_req.email)
-        print(auth_req.senha)
         usuario = (
             session.query(Usuario)
             .filter(
@@ -37,10 +36,15 @@ async def post_auth(auth_req: AuthRequest):
         if usuario:
             code = 200
             token = signJWT(usuario.email)
+            data = {
+                "token": token,
+                "usuarioId": usuario.id
+            }
             response_msg = "Usuário autenticado com sucesso"
         else:
             code = 401
     except Exception as ex:
+        code = 500
         print("Error", ex)
         response_msg = "Erro ao autenticar usuário"
-    return Response(token, code, response_msg, False)
+    return AuthResponse(token, usuario.id)

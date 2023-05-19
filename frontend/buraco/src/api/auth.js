@@ -1,18 +1,15 @@
 import api from './axiosConfig';
 
-export const getUsuarios = async () => {
-    const response = await api.get('/usuarios');
-    return response.data;
-};
-
-export const GetUsuarioById = async (id) => {
-    const response = await api.put(`/usuarios/${id}`);
-    return response.data;
-};
-
-export const createUsuario = async (data) => {
-    const response = await api.post('/usuarios', data);
-    return response.data;
+export const auth = async (email, password) => {
+    const request = {
+        email: email,
+        senha: password
+    }
+    const response = await api.post('/auth', request)
+        .catch(function (error) {
+            console.log(error)
+        });
+    return response;
 };
 
 export const updateUsuario = async (id, data) => {

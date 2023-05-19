@@ -1,5 +1,14 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, ForeignKey, INTEGER, String, TIMESTAMP, BIGINT, BOOLEAN, TEXT
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    INTEGER,
+    String,
+    TIMESTAMP,
+    BIGINT,
+    BOOLEAN,
+    TEXT,
+)
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
@@ -9,6 +18,7 @@ class TamanhoBuraco(Base):
     __tablename__ = "tamanhoBuraco"
     id = Column(INTEGER, primary_key=True)
     nome = Column(String(50), nullable=False)
+    cor = Column(String(50), nullable=False)
     apagado = Column(BOOLEAN, default=False)
 
 
@@ -27,8 +37,7 @@ class Buraco(Base):
     id = Column(INTEGER, primary_key=True)
     latitude = Column(String, nullable=False)
     longitude = Column(String, nullable=False)
-    idTamanhoBuraco = Column(INTEGER, ForeignKey(
-        "tamanhoBuraco.id"), nullable=False)
+    idTamanhoBuraco = Column(INTEGER, ForeignKey("tamanhoBuraco.id"), nullable=False)
     idUsuario = Column(INTEGER, ForeignKey("usuario.id"))
     votos = Column(INTEGER, default=0)
     apagado = Column(BOOLEAN, default=False)

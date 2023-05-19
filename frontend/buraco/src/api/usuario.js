@@ -5,9 +5,12 @@ export const getUsuarios = async () => {
     return response.data;
 };
 
-export const GetUsuarioById = async (id) => {
-    const response = await api.put(`/usuarios/${id}`);
-    return response.data;
+export const getUsuarioById = async (id) => {
+    const response = await api.get(`/usuario/${id}`)
+        .catch(function (error) {
+            console.log(error)
+        });
+    return response.data
 };
 
 export const createUsuario = async (data) => {
