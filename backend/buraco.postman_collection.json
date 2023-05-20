@@ -37,7 +37,13 @@
 					"name": "Tamanho Buraco By Id",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "localhost:8080/tamanho-buraco/1",
 							"host": [
@@ -56,10 +62,16 @@
 					"name": "Tamanho Buraco",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Pequeno\"\r\n}",
+							"raw": "{\r\n    \"nome\": \"Grande\",\r\n    \"cor\": \"red\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -83,7 +95,13 @@
 					"name": "Tamanho Buraco",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
@@ -111,7 +129,13 @@
 					"name": "Tamanho Buraco",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
@@ -144,7 +168,13 @@
 					"name": "Usuário",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "localhost:8080/usuario",
 							"host": [
@@ -165,7 +195,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW5AYWRtaW4uY29tIiwiZXhwaXJlcyI6MTY4MzUwMjAzMi44NTM4NzA5fQ.HV0CjPVLpXvHn5YR_lkwBH9Ppt2T3Icek1joRujZqLI",
+								"value": "Bearer {{token}}",
 								"type": "text"
 							}
 						],
@@ -214,7 +244,13 @@
 					"name": "Usuário",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"senha\": \"admin2\",\r\n    \"ativo\": false\r\n}",
@@ -225,14 +261,83 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/usuario/3",
+							"raw": "localhost:8080/usuario/34",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"usuario",
-								"3"
+								"34"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mudar Senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@admin.com\",\r\n    \"senha\": \"123456\",\r\n    \"nova_senha\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/usuario/nova-senha/4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario",
+								"nova-senha",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Esqueci senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@admin.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/usuario/esqueci-senha",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuario",
+								"esqueci-senha"
 							]
 						}
 					},
@@ -275,7 +380,13 @@
 					"name": "Buraco",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "localhost:8080/buraco",
 							"host": [
@@ -293,16 +404,22 @@
 					"name": "Buraco By Id",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "localhost:8080/buraco/1",
+							"raw": "localhost:8080/buraco/2",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"buraco",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -312,10 +429,16 @@
 					"name": "Buraco",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"latitude\": \"1\",\r\n    \"longitude\": \"2\",\r\n    \"tamanho_buraco_id\": 1,\r\n    \"usuario_id\": 2,\r\n    \"votos\": 0\r\n}",
+							"raw": "{\r\n    \"latitude\": \"-23.78\",\r\n    \"longitude\": \"-46.01\",\r\n    \"tamanho_buraco_id\": 1,\r\n    \"usuario_id\": 1,\r\n    \"votos\": 0\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -339,7 +462,13 @@
 					"name": "Buraco",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"tamanho_buraco_id\": 1,\r\n    \"votos\": 2\r\n}",
@@ -364,19 +493,41 @@
 					"response": []
 				},
 				{
+					"name": "Voto Buraco",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/buraco/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buraco",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Buraco",
 					"request": {
 						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Gigante\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
 							}
-						},
+						],
 						"url": {
 							"raw": "localhost:8080/buraco/1",
 							"host": [
@@ -398,6 +549,22 @@
 			"item": [
 				{
 					"name": "Auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json()\r",
+									"if (response && response.token) {\r",
+									"    pm.collectionVariables.set(\"token\", response.token)\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -424,6 +591,16 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": " "
+		},
+		{
+			"key": "token",
+			"value": ""
 		}
 	]
 }
