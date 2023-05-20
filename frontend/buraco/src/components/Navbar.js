@@ -8,7 +8,6 @@ const AppNavbar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        // window.location.reload();
         navigate("/");
     };
 
@@ -18,6 +17,9 @@ const AppNavbar = () => {
             <Navbar.Toggle aria-controls="app-navbar-collapse" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
+                    <LinkContainer to="/home">
+                        <Nav.Link>Mapa</Nav.Link>
+                    </LinkContainer>
                     <LinkContainer to="/perfil">
                         <Nav.Link>Meu Perfil</Nav.Link>
                     </LinkContainer>

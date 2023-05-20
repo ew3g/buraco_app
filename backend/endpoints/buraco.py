@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from models.request import BuracoRequest, BuracoUpdateRequest
-from models.response import Response, BuracoResponse, BuracoListResponse
+from models.response import BuracoResponse, BuracoListResponse
 from models.models import Buraco
 from db.database import Database
 from sqlalchemy import and_
@@ -17,8 +17,8 @@ engine = database.get_db_connection()
 
 @router.post(
     "/",
-    response_description="Buraco added into the database",
     dependencies=[Depends(JWTBearer())],
+    status_code=201,
 )
 async def add_buraco(buraco_req: BuracoRequest):
     new_buraco = Buraco()
@@ -34,15 +34,17 @@ async def add_buraco(buraco_req: BuracoRequest):
     session.flush()
 
     session.refresh(new_buraco, attribute_names=["id"])
-    data = {"buraco_id": new_buraco.id}
     session.commit()
     session.close()
-    return Response(data, 201, "Buraco cadastrado com sucesso.", False)
 
 
-@router.put("/{buraco_id}", dependencies=[Depends(JWTBearer())])
+@router.put("/{buraco_id}", dependencies=[Depends(JWTBearer())], status_code=204)
 async def update_buraco(buraco_id: str, buraco_update_req: BuracoUpdateRequest):
     session = database.get_db_session(engine)
+
+    buraco_existente = get_buraco(buraco_id)
+    if not buraco_existente:
+        raise HTTPException(status_code=404, detail="Buraco não encontrado")
 
     try:
         is_buraco_updated = (
@@ -59,26 +61,19 @@ async def update_buraco(buraco_id: str, buraco_update_req: BuracoUpdateRequest):
 
         session.flush()
         session.commit()
-        response_msg = "Buraco atualizado com sucesso."
-        response_code = 204
-        error = False
-        if is_buraco_updated == 1:
-            data = session.query(Buraco).filter(Buraco.id == buraco_id).one()
-        elif is_buraco_updated == 0:
-            response_msg = (
-                "Buraco não atualizado. Nenhum Buraco encontrado com o id: "
-                + str(buraco_id)
-            )
-            error = True
-            data = None
-        return Response(data, response_code, response_msg, error)
+        if is_buraco_updated == 0:
+            raise HTTPException(status_code=404, detail="Buraco não existe")
     except Exception as ex:
-        print("Error: ", ex)
+        raise HTTPException(status_code=500, detail="Internal error")
 
 
-@router.delete("/{buraco_id}", dependencies=[Depends(JWTBearer())])
+@router.delete("/{buraco_id}", dependencies=[Depends(JWTBearer())], status_code=204)
 async def delete_buraco(buraco_id: str):
     session = database.get_db_session(engine)
+
+    buraco_existente = get_buraco(buraco_id)
+    if not buraco_existente:
+        raise HTTPException(status_code=404, detail="Buraco não encontrado")
 
     try:
         is_buraco_updated = (
@@ -88,38 +83,18 @@ async def delete_buraco(buraco_id: str):
         )
         session.flush()
         session.commit()
-        response_msg = "Buraco apagado com sucesso"
-        response_code = 204
-        error = False
-        data = {"buraco_id": buraco_id}
         if is_buraco_updated == 0:
-            response_msg = (
-                "Buraco não apagado. Nenhum Buraco encontrado com o id: "
-                + str(buraco_id)
-            )
-            error = True
-            data = None
-        return Response(data, response_code, response_msg, error)
+            raise HTTPException(status_code=404, detail="Buraco não encontrado")
     except Exception as ex:
-        print("Error: ", ex)
+        raise HTTPException(status_code=500, detail="Internal error")
 
 
-@router.get("/{buraco_id}", dependencies=[Depends(JWTBearer())])
+@router.get("/{buraco_id}", dependencies=[Depends(JWTBearer())], status_code=200)
 async def read_buraco(buraco_id: str):
-    session = database.get_db_session(engine)
-    response_msg = "Buraco encontrado com sucesso"
-    data = None
-    try:
-        data = (
-            session.query(Buraco)
-            .filter(and_(Buraco.id == buraco_id, Buraco.apagado == False))
-            .one()
-        )
-    except Exception as ex:
-        print("Error", ex)
-        response_msg = "Buraco não encontrado"
-    error = False
-    return Response(data, 200, response_msg, error)
+    buraco_existente = get_buraco(buraco_id)
+    if not buraco_existente:
+        raise HTTPException(status_code=404, detail="Buraco não encontrado")
+    return BuracoResponse(buraco_existente)
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
@@ -129,14 +104,18 @@ async def read_all_buraco():
     return BuracoListResponse(data)
 
 
-@router.post("/{buraco_id}", dependencies=[Depends(JWTBearer())])
+@router.post("/{buraco_id}", dependencies=[Depends(JWTBearer())], status_code=204)
 async def votar_buraco(buraco_id: str):
     session = database.get_db_session(engine)
+
+    buraco_existente = get_buraco(buraco_id)
+    if not buraco_existente:
+        raise HTTPException(status_code=404, detail="Buraco não encontrado")
 
     try:
         is_buraco_updated = (
             session.query(Buraco)
-            .filter(Buraco.id == buraco_id)
+            .filter(Buraco.id == buraco_id, Buraco.apagado == False)
             .update(
                 {
                     Buraco.votos: Buraco.votos + 1,
@@ -147,18 +126,24 @@ async def votar_buraco(buraco_id: str):
 
         session.flush()
         session.commit()
-        response_msg = "Buraco atualizado com sucesso."
-        response_code = 204
-        error = False
-        if is_buraco_updated == 1:
-            data = session.query(Buraco).filter(Buraco.id == buraco_id).one()
-        elif is_buraco_updated == 0:
-            response_msg = (
-                "Buraco não atualizado. Nenhum Buraco encontrado com o id: "
-                + str(buraco_id)
-            )
-            error = True
-            data = None
-        return Response(data, response_code, response_msg, error)
+        if is_buraco_updated == 0:
+            raise HTTPException(status_code=404, detail="Buraco não encontrado")
     except Exception as ex:
-        print("Error: ", ex)
+        raise HTTPException(status_code=500, detail="Internal error")
+
+
+def get_buraco(id):
+    session = database.get_db_session(engine)
+    try:
+        return (
+            session.query(Buraco)
+            .filter(
+                and_(
+                    Buraco.id == id,
+                    Buraco.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        return None

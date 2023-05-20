@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models.request import AuthRequest
 from models.response import AuthResponse
 from models.models import Usuario
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_handler import signJWT
+import hashlib
 
 router = APIRouter(
     prefix="/auth", tags=["Buraco"], responses={404: {"description": "Not Found"}}
@@ -27,24 +28,17 @@ async def post_auth(auth_req: AuthRequest):
             .filter(
                 and_(
                     Usuario.email == auth_req.email,
-                    Usuario.senha == auth_req.senha,
+                    Usuario.senha
+                    == hashlib.md5(auth_req.senha.encode("utf-8")).hexdigest(),
                     Usuario.ativo == True,
                 )
             )
             .one()
         )
         if usuario:
-            code = 200
             token = signJWT(usuario.email)
-            data = {
-                "token": token,
-                "usuarioId": usuario.id
-            }
-            response_msg = "Usuário autenticado com sucesso"
+            return AuthResponse(token, usuario.id)
         else:
-            code = 401
+            raise HTTPException(status_code=401, detail="Unauthorized")
     except Exception as ex:
-        code = 500
-        print("Error", ex)
-        response_msg = "Erro ao autenticar usuário"
-    return AuthResponse(token, usuario.id)
+        raise HTTPException(status_code=500, detail="Internal error")

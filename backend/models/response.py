@@ -6,22 +6,28 @@ def AuthResponse(token, usuarioId):
     return {"token": token, "usuarioId": usuarioId}
 
 
-def UserResponse(model):
+def UsuarioResponse(model):
     return {"nomeUsuario": model.nomeUsuario, "email": model.email, "id": model.id}
 
+
+def UsuarioListResponse(list):
+    response = []
+    for user in list:
+        response.append(UsuarioResponse(user))
+    return response
+
+
 def TamanhoBuracoResponse(model):
-    return {
-        "id": model.id,
-        "nome": model.nome,
-        "cor": model.cor
-    }
-    
+    return {"id": model.id, "nome": model.nome, "cor": model.cor}
+
+
 def TamanhoBuracoListResponse(list):
     response = []
     for tamanhoBuraco in list:
         response.append(TamanhoBuracoResponse(tamanhoBuraco))
     return response
-    
+
+
 def BuracoResponse(model):
     return {
         "latitude": model.latitude,

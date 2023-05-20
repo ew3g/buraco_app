@@ -6,6 +6,7 @@ import Profile from './components/Profile'
 import Login from './components/Login';
 import EsqueciSenha from './components/EsqueciSenha';
 import Home from './components/Home';
+import TrocarSenha from './components/TrocarSenha';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/perfil" element={<Profile />} />
           <Route exact path="/esqueci-senha" element={<EsqueciSenha />} />
+          <Route exact path="/troca-senha" element={<TrocarSenha />} />
         </Routes>
       </Router>
     </div>

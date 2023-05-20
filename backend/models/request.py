@@ -20,8 +20,17 @@ class UsuarioRequest(BaseModel):
 
 
 class UsuarioUpdateRequest(BaseModel):
-    senha: str = Field(None, title="Usuário Senha", max_length=50)
     ativo: bool = Field(True, title="Usuário Ativo")
+
+
+class NovaSenhaUsuarioRequest(BaseModel):
+    email: EmailStr = Field(None, title="Usuário Email")
+    senha: str = Field(None, title="Usuário Senha", max_length=50)
+    nova_senha: str = Field(None, title="Usuário Nova Senha", max_length=50)
+
+
+class EsqueciSenhaRequest(BaseModel):
+    email: EmailStr = Field(None, title="Usuário Email")
 
 
 class BuracoRequest(BaseModel):

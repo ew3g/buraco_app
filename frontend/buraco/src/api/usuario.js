@@ -27,3 +27,14 @@ export const deleteUsuario = async (id) => {
     const response = await api.delete(`/usuarios/${id}`);
     return response.data;
 };
+
+export const trocarSenha = async (id, data) => {
+    const response = await api.post(`/usuario/nova-senha/${id}`, data)
+        .then(function (res) {
+            return true;
+        })
+        .catch(function (error) {
+            return false;
+        });
+    return response;
+};

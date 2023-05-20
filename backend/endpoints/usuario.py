@@ -1,10 +1,17 @@
-from fastapi import APIRouter, Depends
-from models.request import UsuarioRequest, UsuarioUpdateRequest
-from models.response import Response, UserResponse
+from fastapi import APIRouter, Depends, HTTPException
+from models.request import (
+    UsuarioRequest,
+    UsuarioUpdateRequest,
+    NovaSenhaUsuarioRequest,
+    EsqueciSenhaRequest,
+)
+from models.response import Response, UsuarioResponse, UsuarioListResponse
 from models.models import Usuario
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
+import hashlib
+from auth.auth_handler import signJWT
 
 router = APIRouter(
     prefix="/usuario", tags=["Usuario"], responses={404: {"description": "Not Found"}}
@@ -14,12 +21,14 @@ database = Database()
 engine = database.get_db_connection()
 
 
-@router.post("/", response_description="Usuario added into the database",)
+@router.post(
+    "/", response_description="Usuario added into the database", status_code=201
+)
 async def add_usuario(usuario_req: UsuarioRequest):
     new_usuario = Usuario()
     new_usuario.email = usuario_req.email
     new_usuario.nomeUsuario = usuario_req.nome_usuario
-    new_usuario.senha = usuario_req.senha
+    new_usuario.senha = hashlib.md5(usuario_req.senha.encode("utf-8")).hexdigest()
     new_usuario.ativo = True
 
     session = database.get_db_session(engine)
@@ -30,21 +39,23 @@ async def add_usuario(usuario_req: UsuarioRequest):
         .first()
     )
     if usuario_existente:
-        return Response(None, 400, "Usuario já existe", False)
+        raise HTTPException(status_code=409, detail="Usuário já existe")
 
     session.add(new_usuario)
     session.flush()
 
     session.refresh(new_usuario, attribute_names=["id"])
-    data = {"usuario_id": new_usuario.id}
     session.commit()
     session.close()
-    return Response(data, 201, "Usuario cadastrado com sucesso.", False)
 
 
-@router.put("/{usuario_id}", dependencies=[Depends(JWTBearer())])
+@router.put("/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204)
 async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateRequest):
     session = database.get_db_session(engine)
+
+    usuario_existente = get_usuario(usuario_id)
+    if not usuario_existente:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     try:
         is_usuario_updated = (
@@ -52,7 +63,6 @@ async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateReque
             .filter(Usuario.id == usuario_id)
             .update(
                 {
-                    Usuario.senha: usuario_update_req.senha,
                     Usuario.ativo: usuario_update_req.ativo,
                 },
                 synchronize_session=False,
@@ -61,26 +71,19 @@ async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateReque
 
         session.flush()
         session.commit()
-        response_msg = "Usuario atualizado com sucesso."
-        response_code = 204
-        error = False
-        if is_usuario_updated == 1:
-            data = session.query(Usuario).filter(Usuario.id == usuario_id).one()
-        elif is_usuario_updated == 0:
-            response_msg = (
-                "Usuario não atualizado. Nenhum Usuario encontrado com o id: "
-                + str(usuario_id)
-            )
-            error = True
-            data = None
-        return Response(data, response_code, response_msg, error)
+        if is_usuario_updated == 0:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
     except Exception as ex:
-        print("Error: ", ex)
+        raise HTTPException(status_code=500, detail="Internal error")
 
 
-@router.delete("/{usuario_id}", dependencies=[Depends(JWTBearer())])
+@router.delete("/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204)
 async def delete_usuario(usuario_id: str):
     session = database.get_db_session(engine)
+
+    usuario_existente = get_usuario(usuario_id)
+    if not usuario_existente:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     try:
         is_usuario_updated = (
@@ -90,42 +93,140 @@ async def delete_usuario(usuario_id: str):
         )
         session.flush()
         session.commit()
-        response_msg = "Usuario apagado com sucesso"
-        response_code = 204
-        error = False
-        data = {"usuario_id": usuario_id}
         if is_usuario_updated == 0:
-            response_msg = (
-                "Usuario não apagado. Nenhum Usuario encontrado com o id: "
-                + str(usuario_id)
-            )
-            error = True
-            data = None
-        return Response(data, response_code, response_msg, error)
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
     except Exception as ex:
-        print("Error: ", ex)
+        raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/{usuario_id}", dependencies=[Depends(JWTBearer())])
 async def read_usuario(usuario_id: str):
-    session = database.get_db_session(engine)
-    response_msg = "Usuario encontrado com sucesso"
-    data = None
-    try:
-        data = (
-            session.query(Usuario)
-            .filter(and_(Usuario.id == usuario_id, Usuario.apagado == False))
-            .one()
-        )
-    except Exception as ex:
-        print("Error", ex)
-        response_msg = "Usuario não encontrado"
-    error = False
-    return UserResponse(data)
+    usuario_existente = get_usuario(usuario_id)
+    if not usuario_existente:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    return UsuarioResponse(usuario_existente)
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
 async def read_all_usuario():
     session = database.get_db_session(engine)
     data = session.query(Usuario).filter(Usuario.apagado == False).all()
-    return Response(data, 200, "", False)
+    return UsuarioListResponse(data)
+
+
+@router.post(
+    "/nova-senha/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204
+)
+async def change_password_usuario(
+    usuario_id: str, nova_senha_usuario_req: NovaSenhaUsuarioRequest
+):
+    session = database.get_db_session(engine)
+
+    usuario_existente = None
+    try:
+        usuario_existente = (
+            session.query(Usuario)
+            .filter(
+                and_(
+                    Usuario.id == usuario_id,
+                    Usuario.email == nova_senha_usuario_req.email,
+                    Usuario.senha
+                    == hashlib.md5(
+                        nova_senha_usuario_req.senha.encode("utf-8")
+                    ).hexdigest(),
+                    Usuario.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        usuario_existente = None
+
+    if not usuario_existente:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    try:
+        is_usuario_updated = (
+            session.query(Usuario)
+            .filter(Usuario.id == usuario_id)
+            .update(
+                {
+                    Usuario.senha: hashlib.md5(
+                        nova_senha_usuario_req.nova_senha.encode("utf-8")
+                    ).hexdigest(),
+                },
+                synchronize_session=False,
+            )
+        )
+
+        session.flush()
+        session.commit()
+        if is_usuario_updated == 0:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Internal error")
+
+
+@router.post("/esqueci-senha", dependencies=[Depends(JWTBearer())], status_code=201)
+async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
+    session = database.get_db_session(engine)
+
+    usuario_existente = None
+    try:
+        usuario_existente = (
+            session.query(Usuario)
+            .filter(
+                and_(
+                    Usuario.email == esqueci_senha_request.email,
+                    Usuario.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        usuario_existente = None
+
+    if usuario_existente:
+        token = signJWT(usuario_existente.email)
+        print(token)
+
+
+@router.post("/esqueci-senha", dependencies=[Depends(JWTBearer())], status_code=201)
+async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
+    session = database.get_db_session(engine)
+
+    usuario_existente = None
+    try:
+        usuario_existente = (
+            session.query(Usuario)
+            .filter(
+                and_(
+                    Usuario.email == esqueci_senha_request.email,
+                    Usuario.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        usuario_existente = None
+
+    if usuario_existente:
+        token = signJWT(usuario_existente.email)
+        print(token)
+
+
+def get_usuario(id):
+    session = database.get_db_session(engine)
+    try:
+        return (
+            session.query(Usuario)
+            .filter(
+                and_(
+                    Usuario.id == id,
+                    Usuario.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        return None

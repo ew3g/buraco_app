@@ -1,4 +1,4 @@
-import { React, useState } from 'react'
+import { React, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { auth } from '../api/auth'
 import logo from '../img/pothole.png'

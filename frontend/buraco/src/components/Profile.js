@@ -3,10 +3,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { getUsuarioById } from '../api/usuario';
 import Login from './Login';
 import AppNavbar from './Navbar';
-import '../style/profile.css'
+import '../style/profile.css';
+import { useNavigate } from "react-router-dom";
+
 
 
 const Profile = () => {
+    const navigate = useNavigate();
+
     const [usuario, setUsuario] = useState([]);
 
     useEffect(() => {
@@ -20,6 +24,10 @@ const Profile = () => {
         };
         fetchUsuario();
     }, []);
+
+    const handleTrocarSenha = () => {
+        navigate("/troca-senha");
+    }
 
 
     return (
@@ -36,7 +44,7 @@ const Profile = () => {
                             </div>
                         </div>
                         <div>
-                            <button className="btn btn-primary" onClick={undefined}>
+                            <button className="btn btn-primary" onClick={handleTrocarSenha}>
                                 Trocar senha
                             </button>
                         </div>

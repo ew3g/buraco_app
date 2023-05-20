@@ -5,8 +5,8 @@ use buraco_db;
 -- drop table tamanhoBuraco;
 create table if not exists tamanhoBuraco (
 	id int auto_increment primary key,
-    nome varchar(50) not null unique,
-    cor varchar(50) not null unique,
+    nome varchar(50) not null,
+    cor varchar(50) not null,
     apagado boolean default false
 );
 
