@@ -1,8 +1,11 @@
 import api from './axiosConfig';
 
 export const getTamanhosBuraco = async () => {
-    const response = await api.get('/tamanhosBuraco');
-    return response.data;
+    const response = await api.get('/tamanho-buraco')
+        .catch(function (error) {
+            console.log(error)
+        });
+    return response.data
 };
 
 export const getTamanhoBuracoById = async (id) => {
@@ -11,7 +14,7 @@ export const getTamanhoBuracoById = async (id) => {
 };
 
 export const createTamanhoBuraco = async (data) => {
-    const response = await api.post('/tamanhosBuraco', data);
+    const response = await api.post('/tamanho-buraco', data);
     return response.data;
 };
 

@@ -14,7 +14,10 @@ export const getBuracoById = async (id) => {
 };
 
 export const createBuraco = async (data) => {
-    const response = await api.post('/buracos', data);
+    const response = await api.post('/buraco', data)
+        .catch(function (error) {
+            console.log(error)
+        });
     return response.data;
 };
 

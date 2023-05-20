@@ -15,7 +15,7 @@ const Home = () => {
         if (!storedToken) {
             navigate("/");
         }
-    }, []);
+    }, [navigate]);
 
     return (
         <div>

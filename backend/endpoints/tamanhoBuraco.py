@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from models.request import TamanhoBuracoRequest, TamanhoBuracoUpdateRequest
-from models.response import Response
+from models.response import Response, TamanhoBuracoListResponse
 from models.models import TamanhoBuraco
 from db.database import Database
 from sqlalchemy import and_
@@ -145,4 +145,4 @@ async def read_tamanho_buraco(tamanho_buraco_id: str):
 async def read_all_tamanho_buraco():
     session = database.get_db_session(engine)
     data = session.query(TamanhoBuraco).filter(TamanhoBuraco.apagado == False).all()
-    return Response(data, 200, "", False)
+    return TamanhoBuracoListResponse(data)

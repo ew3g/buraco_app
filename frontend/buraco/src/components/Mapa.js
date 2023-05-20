@@ -1,15 +1,11 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useRef } from "react";
 import 'leaflet/dist/leaflet.css';
 
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
 import L from 'leaflet';
 
-import { getBuracos, votoBuraco } from "../api/buraco";
-
-
-
-
-const text = L.divIcon({ html: 'Your HTML text here' });
+import { getBuracos, votoBuraco, createBuraco } from "../api/buraco";
+import { getTamanhosBuraco } from "../api/tamanhoBuraco";
 
 
 const markerIcon = (color) => {
@@ -26,6 +22,11 @@ const markerIcon = (color) => {
 
 const Mapa = () => {
     const [buracos, setBuracos] = useState([]);
+    const [tamanhosBuraco, setTamanhosBuraco] = useState([])
+
+    const [tamanhoBuracoSelecionado, setTamanhoBuracoSelecionado] = useState('')
+
+    const [markerPosition, setMarkerPosition] = useState(null)
 
     useEffect(() => {
         const fetchBuracos = async () => {
@@ -33,7 +34,15 @@ const Mapa = () => {
             console.log(data);
             setBuracos(data)
         };
+
+        const fetchTamanhosBuraco = async () => {
+            const data = await getTamanhosBuraco();
+            console.log(data);
+            setTamanhosBuraco(data);
+        }
+
         fetchBuracos();
+        fetchTamanhosBuraco();
     }, []);
 
 
@@ -45,11 +54,31 @@ const Mapa = () => {
 
 
     const handleMapClick = (event) => {
-        console.log(event);
-        console.log("clicou");
-        const { lat, lng } = event.latlng;
-        console.log(lat, lng);
+        // console.log(event);
+        // console.log("clicou");
+        // const { lat, lng } = event.latlng;
+        // console.log(lat, lng);
+        setMarkerPosition(event.latlng)
     }
+
+    const handleMarkerConfirm = async () => {
+        console.log(markerPosition);
+        const request = {
+            "latitude": markerPosition.lat.toString(),
+            "longitude": markerPosition.lng.toString(),
+            "tamanho_buraco_id": Number(tamanhoBuracoSelecionado),
+            "usuario_id": Number(localStorage.getItem('usuarioId')),
+        }
+        console.log(request);
+        const data = await createBuraco(request);
+        console.log(data);
+
+        setMarkerPosition(null);
+        window.location.reload(false);
+
+    }
+
+
 
     function MapClickHandler() {
         useMapEvents({
@@ -57,6 +86,22 @@ const Mapa = () => {
         });
         return null;
     }
+
+
+    const PopupMarker = (props) => {
+        const leafletRef = useRef();
+        useEffect(() => {
+            leafletRef.current.openPopup();
+        }, [])
+        return <Marker ref={leafletRef} {...props} />
+    }
+
+
+    const handleTamanhoBuracoSelectChange = (event) => {
+        console.log(event.target.value);
+        setTamanhoBuracoSelecionado(event.target.value);
+    }
+
 
     const position = [-23.455, -46.533]
 
@@ -67,6 +112,41 @@ const Mapa = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapClickHandler />
+            {markerPosition && (
+                <PopupMarker position={markerPosition} icon={markerIcon("blue")}>
+                    <Popup>
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-md-12">
+                                    Deseja cadastrar um buraco aqui?
+                                </div>
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        Informe o tamanho do buraco:
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <select value={tamanhoBuracoSelecionado} onChange={handleTamanhoBuracoSelectChange}>
+                                            <option value="null">Selecione uma opção</option>
+                                            {tamanhosBuraco.map(tamanhoBuraco => (
+                                                <option key={tamanhoBuraco.id} value={tamanhoBuraco.id}>
+                                                    {tamanhoBuraco.nome}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <button className="btn btn-primary" onClick={handleMarkerConfirm}>Confirmar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </Popup>
+                </PopupMarker>
+            )}
             {buracos.map((buraco) => (
                 <Marker key={buraco.id} position={[buraco.latitude, buraco.longitude]} icon={markerIcon(buraco.cor)}>
                     <Popup>
@@ -86,8 +166,6 @@ const Mapa = () => {
                                     <button className="btn btn-danger" onClick={() => handleVotoBuraco(buraco.id)}>Votar</button>
                                 </div>
                             </div>
-
-
                         </div>
                     </Popup>
                 </Marker>
