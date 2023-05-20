@@ -83,15 +83,23 @@ const Login = () => {
                             <div className='alert'>Falha no login. Verifique suas credenciais e tente novamente.</div>
                         )}
                         <div className='row'>
-                            <div className='col-md-6'>
+                            <div className='col-md-12'>
                                 <button className="btn btn-primary" onClick={handleLogin}>
                                     Login
                                 </button>
-                            </div>
-                            <div className='col-md-6'>
-                                <a href='/esqueci-senha'>Esqueci minha senha</a>
+
                             </div>
                         </div>
+                        <br />
+                        <div className='row'>
+                            <div className='col-md-12'>
+                                <div className='col-md-9'>
+                                    <a className='btn btn-primary' href='/novo-usuario'>Novo Usuário</a>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                     </form>
                 </div>

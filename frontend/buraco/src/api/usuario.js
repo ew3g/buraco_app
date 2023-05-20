@@ -14,8 +14,14 @@ export const getUsuarioById = async (id) => {
 };
 
 export const createUsuario = async (data) => {
-    const response = await api.post('/usuarios', data);
-    return response.data;
+    const response = await api.post("/usuario", data)
+        .then(function (res) {
+            return res;
+        })
+        .catch(function (error) {
+            return error.response;
+        });
+    return response;
 };
 
 export const updateUsuario = async (id, data) => {

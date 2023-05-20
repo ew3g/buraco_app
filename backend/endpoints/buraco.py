@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.request import BuracoRequest, BuracoUpdateRequest
 from models.response import BuracoResponse, BuracoListResponse
 from models.models import Buraco
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
+from endpoints.usuario import get_usuario_by_email
+from auth.auth_handler import decodeJWT
 
 
 router = APIRouter(
@@ -20,7 +22,7 @@ engine = database.get_db_connection()
     dependencies=[Depends(JWTBearer())],
     status_code=201,
 )
-async def add_buraco(buraco_req: BuracoRequest):
+async def add_buraco(buraco_req: BuracoRequest):    
     new_buraco = Buraco()
     new_buraco.idTamanhoBuraco = buraco_req.tamanho_buraco_id
     new_buraco.idUsuario = buraco_req.usuario_id

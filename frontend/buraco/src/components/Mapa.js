@@ -54,18 +54,22 @@ const Mapa = () => {
 
 
     const handleMapClick = (event) => {
-        // console.log(event);
-        // console.log("clicou");
-        // const { lat, lng } = event.latlng;
-        // console.log(lat, lng);
         setMarkerPosition(event.latlng)
     }
 
     const handleMarkerConfirm = async () => {
+        const lat = markerPosition.lat;
+        const lng = markerPosition.lng;
+
         console.log(markerPosition);
+        if (!checkSeDentroDeGuarulhos(lat, lng)) {
+            alert('O buraco deve estar dentro dos limites da cidade de Guarulhos!');
+            return;
+        }
+
         const request = {
-            "latitude": markerPosition.lat.toString(),
-            "longitude": markerPosition.lng.toString(),
+            "latitude": lat.toString(),
+            "longitude": lng.toString(),
             "tamanho_buraco_id": Number(tamanhoBuracoSelecionado),
             "usuario_id": Number(localStorage.getItem('usuarioId')),
         }
@@ -78,6 +82,25 @@ const Mapa = () => {
 
     }
 
+    const checkSeDentroDeGuarulhos = (latitude, longitude) => {
+        const guarulhosBounds = {
+            north: -23.367433,
+            south: -23.516082,
+            west: -46.570909,
+            east: -46.373725
+        };
+
+        if (
+            latitude >= guarulhosBounds.south &&
+            latitude <= guarulhosBounds.north &&
+            longitude >= guarulhosBounds.west &&
+            longitude <= guarulhosBounds.east
+        ) {
+            return true;
+        }
+
+        return false;
+    }
 
 
     function MapClickHandler() {

@@ -30,6 +30,8 @@ class Usuario(Base):
     senha = Column(String(50), nullable=False)
     ativo = Column(BOOLEAN)
     apagado = Column(BOOLEAN, default=False)
+    adm = Column(BOOLEAN, default=False)
+
 
 
 class Buraco(Base):

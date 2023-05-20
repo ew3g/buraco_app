@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.request import TamanhoBuracoRequest, TamanhoBuracoUpdateRequest
 from models.response import TamanhoBuracoListResponse, TamanhoBuracoResponse
 from models.models import TamanhoBuraco
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
-
+from auth.auth_handler import decodeJWT
+from endpoints.usuario import get_usuario_by_email
 
 router = APIRouter(
     prefix="/tamanho-buraco",
@@ -23,7 +24,13 @@ engine = database.get_db_connection()
     dependencies=[Depends(JWTBearer())],
     status_code=201,
 )
-async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
+async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest, req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
+    if not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
+    
     new_tamanho_buraco = TamanhoBuraco()
     new_tamanho_buraco.nome = tamanho_buraco_req.nome
     new_tamanho_buraco.cor = tamanho_buraco_req.cor
@@ -50,8 +57,14 @@ async def add_tamanho_buraco(tamanho_buraco_req: TamanhoBuracoRequest):
     "/{tamanho_buraco_id}", dependencies=[Depends(JWTBearer())], status_code=204
 )
 async def update_tamanho_buraco(
-    tamanho_buraco_id: str, tamanho_buraco_update_req: TamanhoBuracoUpdateRequest
+    tamanho_buraco_id: str, tamanho_buraco_update_req: TamanhoBuracoUpdateRequest, req: Request
 ):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
+    if not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
+    
     session = database.get_db_session(engine)
 
     tamanho_buraco_existente = get_tamanho_buraco(tamanho_buraco_id)
@@ -82,7 +95,13 @@ async def update_tamanho_buraco(
 @router.delete(
     "/{tamanho_buraco_id}", dependencies=[Depends(JWTBearer())], status_code=204
 )
-async def delete_tamanho_buraco(tamanho_buraco_id: str):
+async def delete_tamanho_buraco(tamanho_buraco_id: str, req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
+    if not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
+    
     session = database.get_db_session(engine)
 
     tamanho_buraco_existente = get_tamanho_buraco(tamanho_buraco_id)

@@ -2,6 +2,12 @@ create database if not exists buraco_db;
 
 use buraco_db;
 
+/*
+drop table buraco;
+drop table tamanhoBuraco;
+drop table usuario;
+*/
+
 -- drop table tamanhoBuraco;
 create table if not exists tamanhoBuraco (
 	id int auto_increment primary key,
@@ -14,10 +20,11 @@ create table if not exists tamanhoBuraco (
 create table if not exists usuario (
 	id int auto_increment primary key,
     nomeUsuario varchar(50) not null,
-    email varchar(150) not null,
+    email varchar(150) not null unique,
     senha varchar(50) not null,
     ativo boolean,
-    apagado boolean default false
+    apagado boolean default false,
+    adm boolean
 );
 
 -- drop table buraco

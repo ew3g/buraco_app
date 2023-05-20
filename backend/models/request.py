@@ -17,6 +17,7 @@ class UsuarioRequest(BaseModel):
     email: EmailStr = Field(None, title="Usuário Email")
     senha: str = Field(None, title="Usuário Senha", max_length=50)
     ativo: bool = Field(None, title="Usuário Ativo")
+    adm: bool = Field(None, title="Usuário Adm")
 
 
 class UsuarioUpdateRequest(BaseModel):

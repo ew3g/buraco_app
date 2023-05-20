@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.request import (
     UsuarioRequest,
     UsuarioUpdateRequest,
@@ -11,7 +11,7 @@ from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
 import hashlib
-from auth.auth_handler import signJWT
+from auth.auth_handler import signJWT, decodeJWT
 
 router = APIRouter(
     prefix="/usuario", tags=["Usuario"], responses={404: {"description": "Not Found"}}
@@ -29,13 +29,14 @@ async def add_usuario(usuario_req: UsuarioRequest):
     new_usuario.email = usuario_req.email
     new_usuario.nomeUsuario = usuario_req.nome_usuario
     new_usuario.senha = hashlib.md5(usuario_req.senha.encode("utf-8")).hexdigest()
+    new_usuario.adm = usuario_req.adm
     new_usuario.ativo = True
 
     session = database.get_db_session(engine)
 
     usuario_existente = (
         session.query(Usuario)
-        .filter(Usuario.nomeUsuario == new_usuario.nomeUsuario)
+        .filter(Usuario.email == new_usuario.email)
         .first()
     )
     if usuario_existente:
@@ -50,12 +51,17 @@ async def add_usuario(usuario_req: UsuarioRequest):
 
 
 @router.put("/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204)
-async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateRequest):
+async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateRequest, req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
     session = database.get_db_session(engine)
 
     usuario_existente = get_usuario(usuario_id)
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_existente.email != email_usuario and not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
 
     try:
         is_usuario_updated = (
@@ -78,18 +84,23 @@ async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateReque
 
 
 @router.delete("/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204)
-async def delete_usuario(usuario_id: str):
+async def delete_usuario(usuario_id: str, req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
     session = database.get_db_session(engine)
 
     usuario_existente = get_usuario(usuario_id)
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_existente.email != email_usuario and not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
 
     try:
         is_usuario_updated = (
             session.query(Usuario)
             .filter(and_(Usuario.id == usuario_id, Usuario.apagado == False))
-            .update({Usuario.apagado: True}, synchronize_session=False)
+            .update({Usuario.apagado: True, Usuario.ativo: False}, synchronize_session=False)
         )
         session.flush()
         session.commit()
@@ -100,15 +111,26 @@ async def delete_usuario(usuario_id: str):
 
 
 @router.get("/{usuario_id}", dependencies=[Depends(JWTBearer())])
-async def read_usuario(usuario_id: str):
+async def read_usuario(usuario_id: str, req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
     usuario_existente = get_usuario(usuario_id)
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_existente.email != email_usuario and not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
     return UsuarioResponse(usuario_existente)
 
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
-async def read_all_usuario():
+async def read_all_usuario(req: Request):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
+    if not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
+    
     session = database.get_db_session(engine)
     data = session.query(Usuario).filter(Usuario.apagado == False).all()
     return UsuarioListResponse(data)
@@ -118,8 +140,11 @@ async def read_all_usuario():
     "/nova-senha/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204
 )
 async def change_password_usuario(
-    usuario_id: str, nova_senha_usuario_req: NovaSenhaUsuarioRequest
+    usuario_id: str, nova_senha_usuario_req: NovaSenhaUsuarioRequest, req: Request
 ):
+    email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
+    usuario_logado = get_usuario_by_email(email_usuario)
+    
     session = database.get_db_session(engine)
 
     usuario_existente = None
@@ -144,6 +169,8 @@ async def change_password_usuario(
 
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_existente.email != email_usuario and not usuario_logado.adm:
+        raise HTTPException(status_code=403, detail="Ação proibida")
 
     try:
         is_usuario_updated = (
@@ -191,30 +218,6 @@ async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest)
         print(token)
 
 
-@router.post("/esqueci-senha", dependencies=[Depends(JWTBearer())], status_code=201)
-async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
-    session = database.get_db_session(engine)
-
-    usuario_existente = None
-    try:
-        usuario_existente = (
-            session.query(Usuario)
-            .filter(
-                and_(
-                    Usuario.email == esqueci_senha_request.email,
-                    Usuario.apagado == False,
-                )
-            )
-            .one()
-        )
-    except:
-        usuario_existente = None
-
-    if usuario_existente:
-        token = signJWT(usuario_existente.email)
-        print(token)
-
-
 def get_usuario(id):
     session = database.get_db_session(engine)
     try:
@@ -223,6 +226,22 @@ def get_usuario(id):
             .filter(
                 and_(
                     Usuario.id == id,
+                    Usuario.apagado == False,
+                )
+            )
+            .one()
+        )
+    except:
+        return None
+
+def get_usuario_by_email(email):
+    session = database.get_db_session(engine)
+    try:
+        return (
+            session.query(Usuario)
+            .filter(
+                and_(
+                    Usuario.email == email,
                     Usuario.apagado == False,
                 )
             )
