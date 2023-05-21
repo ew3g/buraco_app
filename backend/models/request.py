@@ -18,6 +18,9 @@ class UsuarioRequest(BaseModel):
     senha: str = Field(None, title="Usuário Senha", max_length=50)
     ativo: bool = Field(None, title="Usuário Ativo")
     adm: bool = Field(None, title="Usuário Adm")
+    questao_usuario_id: int = Field(None, title="Questão Usuário Id")
+    questao_usuario_resposta: str = Field(None, title="Questão Usuário Resposta", max_length=50)
+
 
 
 class UsuarioUpdateRequest(BaseModel):
@@ -32,7 +35,8 @@ class NovaSenhaUsuarioRequest(BaseModel):
 
 class EsqueciSenhaRequest(BaseModel):
     email: EmailStr = Field(None, title="Usuário Email")
-
+    questao_usuario_resposta: str = Field(None, title="Questão Usuário Resposta", max_length=50)
+    nova_senha: str = Field(None, title="Usuário Nova Senha", max_length=50)
 
 class BuracoRequest(BaseModel):
     latitude: str = Field(None, title="Buraco Latitude")
@@ -53,3 +57,6 @@ class BuracoUpdateRequest(BaseModel):
 class AuthRequest(BaseModel):
     email: EmailStr = Field(None, title="Usuário Email")
     senha: str = Field(None, title="Usuário Senha")
+    
+class QuestaoRequest(BaseModel):
+    email: EmailStr = Field(None, title="Usuário Email")

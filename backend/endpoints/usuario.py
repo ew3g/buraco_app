@@ -6,7 +6,7 @@ from models.request import (
     EsqueciSenhaRequest,
 )
 from models.response import Response, UsuarioResponse, UsuarioListResponse
-from models.models import Usuario
+from models.models import Usuario, QuestaoUsuarioResposta
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
@@ -44,8 +44,16 @@ async def add_usuario(usuario_req: UsuarioRequest):
 
     session.add(new_usuario)
     session.flush()
-
     session.refresh(new_usuario, attribute_names=["id"])
+    
+    new_questao_usuario_resposta = QuestaoUsuarioResposta()
+    new_questao_usuario_resposta.idUsuario = new_usuario.id
+    new_questao_usuario_resposta.idQuestaoUsuario = usuario_req.questao_usuario_id
+    new_questao_usuario_resposta.resposta = usuario_req.questao_usuario_resposta
+    
+    session.add(new_questao_usuario_resposta)
+
+    
     session.commit()
     session.close()
 
@@ -194,7 +202,7 @@ async def change_password_usuario(
         raise HTTPException(status_code=500, detail="Internal error")
 
 
-@router.post("/esqueci-senha", dependencies=[Depends(JWTBearer())], status_code=201)
+@router.post("/esqueci-senha", status_code=200)
 async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
     session = database.get_db_session(engine)
 
@@ -213,9 +221,32 @@ async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest)
     except:
         usuario_existente = None
 
-    if usuario_existente:
-        token = signJWT(usuario_existente.email)
-        print(token)
+    if not usuario_existente:
+        raise HTTPException(status_code=500, detail="Internal error")
+    
+    questao_usuario_resposta = None
+    try:
+        questao_usuario_resposta = (
+            session.query(QuestaoUsuarioResposta).filter(and_(QuestaoUsuarioResposta.idUsuario == usuario_existente.id)).one()
+        )
+    except:
+        raise HTTPException(status_code=500, detail="Internal error")
+    
+    if not questao_usuario_resposta:
+        raise HTTPException(status_code=500, detail="Internal error")
+    
+    if questao_usuario_resposta.resposta != esqueci_senha_request.questao_usuario_resposta:
+        raise HTTPException(status_code=400, detail="A resposta não confere")
+    
+    print(usuario_existente.id)
+    session.query(Usuario).filter(Usuario.id == usuario_existente.id).update(
+        {
+            Usuario.senha: hashlib.md5(esqueci_senha_request.nova_senha.encode('utf-8')).hexdigest(),
+        },
+        synchronize_session=False,
+    )
+    session.flush()
+    session.commit()
 
 
 def get_usuario(id):

@@ -5,6 +5,8 @@ use buraco_db;
 /*
 drop table buraco;
 drop table tamanhoBuraco;
+drop table questaoUsuarioResposta;
+drop table questaoUsuario;
 drop table usuario;
 */
 
@@ -25,6 +27,22 @@ create table if not exists usuario (
     ativo boolean,
     apagado boolean default false,
     adm boolean
+);
+
+-- drop table questaoUsuario;
+create table if not exists questaoUsuario (
+    id int auto_increment primary key,
+    pergunta varchar(100) not null
+);
+
+-- drop table questaoUsuarioResposta;
+create table if not exists questaoUsuarioResposta (
+    id int auto_increment primary key,
+    idQuestaoUsuario int not null,
+    idUsuario int not null,
+    resposta varchar(50) not null,
+    constraint fk_resposta_questao foreign key (idQuestaoUsuario) references questaoUsuario(id),
+    constraint fk_resposta_usuario foreign key (idUsuario) references usuario(id) 
 );
 
 -- drop table buraco

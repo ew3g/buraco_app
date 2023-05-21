@@ -44,3 +44,15 @@ export const trocarSenha = async (id, data) => {
         });
     return response;
 };
+
+export const esqueciSenha = async (data) => {
+    console.log(data)
+    const response = await api.post("/usuario/esqueci-senha", data)
+        .then(function (res) {
+            return res;
+        })
+        .catch(function (error) {
+            return error.response;
+        });
+    return response;
+};

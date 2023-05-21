@@ -33,6 +33,21 @@ class Usuario(Base):
     adm = Column(BOOLEAN, default=False)
 
 
+class QuestaoUsuario(Base):
+    __tablename__ = "questaoUsuario"
+    id = Column(INTEGER, primary_key=True)
+    pergunta = Column(String(100), nullable=False)
+    
+class QuestaoUsuarioResposta(Base):
+    __tablename__ = "questaoUsuarioResposta"
+    id = Column(INTEGER, primary_key=True)
+    idQuestaoUsuario = Column(INTEGER, ForeignKey("questaoUsuario.id"))
+    idUsuario = Column(INTEGER, ForeignKey("usuario.id"))
+    resposta = Column(String(50), nullable=False)
+
+    usuario = relationship("Usuario", backref="questaoUsuarioResposta")
+    questaoUsuario = relationship("QuestaoUsuario", backref="questaoUsuarioResposta")
+
 
 class Buraco(Base):
     __tablename__ = "buraco"
