@@ -45,5 +45,13 @@ def BuracoListResponse(list):
         response.append(BuracoResponse(buraco))
     return response
 
+
 def QuestaoResponse(model):
     return {"id": model.id, "pergunta": model.pergunta}
+
+
+def QuestaoListResponse(list):
+    response = []
+    for questao in list:
+        response.append(QuestaoResponse(questao))
+    return response

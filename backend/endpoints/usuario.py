@@ -35,9 +35,7 @@ async def add_usuario(usuario_req: UsuarioRequest):
     session = database.get_db_session(engine)
 
     usuario_existente = (
-        session.query(Usuario)
-        .filter(Usuario.email == new_usuario.email)
-        .first()
+        session.query(Usuario).filter(Usuario.email == new_usuario.email).first()
     )
     if usuario_existente:
         raise HTTPException(status_code=409, detail="Usuário já existe")
@@ -45,24 +43,25 @@ async def add_usuario(usuario_req: UsuarioRequest):
     session.add(new_usuario)
     session.flush()
     session.refresh(new_usuario, attribute_names=["id"])
-    
+
     new_questao_usuario_resposta = QuestaoUsuarioResposta()
     new_questao_usuario_resposta.idUsuario = new_usuario.id
     new_questao_usuario_resposta.idQuestaoUsuario = usuario_req.questao_usuario_id
     new_questao_usuario_resposta.resposta = usuario_req.questao_usuario_resposta
-    
+
     session.add(new_questao_usuario_resposta)
 
-    
     session.commit()
     session.close()
 
 
 @router.put("/{usuario_id}", dependencies=[Depends(JWTBearer())], status_code=204)
-async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateRequest, req: Request):
+async def update_usuario(
+    usuario_id: str, usuario_update_req: UsuarioUpdateRequest, req: Request
+):
     email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
     usuario_logado = get_usuario_by_email(email_usuario)
-    
+
     session = database.get_db_session(engine)
 
     usuario_existente = get_usuario(usuario_id)
@@ -95,7 +94,7 @@ async def update_usuario(usuario_id: str, usuario_update_req: UsuarioUpdateReque
 async def delete_usuario(usuario_id: str, req: Request):
     email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
     usuario_logado = get_usuario_by_email(email_usuario)
-    
+
     session = database.get_db_session(engine)
 
     usuario_existente = get_usuario(usuario_id)
@@ -108,7 +107,9 @@ async def delete_usuario(usuario_id: str, req: Request):
         is_usuario_updated = (
             session.query(Usuario)
             .filter(and_(Usuario.id == usuario_id, Usuario.apagado == False))
-            .update({Usuario.apagado: True, Usuario.ativo: False}, synchronize_session=False)
+            .update(
+                {Usuario.apagado: True, Usuario.ativo: False}, synchronize_session=False
+            )
         )
         session.flush()
         session.commit()
@@ -122,7 +123,7 @@ async def delete_usuario(usuario_id: str, req: Request):
 async def read_usuario(usuario_id: str, req: Request):
     email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
     usuario_logado = get_usuario_by_email(email_usuario)
-    
+
     usuario_existente = get_usuario(usuario_id)
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
@@ -135,10 +136,10 @@ async def read_usuario(usuario_id: str, req: Request):
 async def read_all_usuario(req: Request):
     email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
     usuario_logado = get_usuario_by_email(email_usuario)
-    
+
     if not usuario_logado.adm:
         raise HTTPException(status_code=403, detail="Ação proibida")
-    
+
     session = database.get_db_session(engine)
     data = session.query(Usuario).filter(Usuario.apagado == False).all()
     return UsuarioListResponse(data)
@@ -152,7 +153,7 @@ async def change_password_usuario(
 ):
     email_usuario = decodeJWT(req.headers["Authorization"].split()[1])["user_id"]
     usuario_logado = get_usuario_by_email(email_usuario)
-    
+
     session = database.get_db_session(engine)
 
     usuario_existente = None
@@ -203,7 +204,7 @@ async def change_password_usuario(
 
 
 @router.post("/esqueci-senha", status_code=200)
-async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
+async def esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest):
     session = database.get_db_session(engine)
 
     usuario_existente = None
@@ -223,25 +224,32 @@ async def enviar_email_esqueci_senha(esqueci_senha_request: EsqueciSenhaRequest)
 
     if not usuario_existente:
         raise HTTPException(status_code=500, detail="Internal error")
-    
+
     questao_usuario_resposta = None
     try:
         questao_usuario_resposta = (
-            session.query(QuestaoUsuarioResposta).filter(and_(QuestaoUsuarioResposta.idUsuario == usuario_existente.id)).one()
+            session.query(QuestaoUsuarioResposta)
+            .filter(and_(QuestaoUsuarioResposta.idUsuario == usuario_existente.id))
+            .one()
         )
     except:
         raise HTTPException(status_code=500, detail="Internal error")
-    
+
     if not questao_usuario_resposta:
         raise HTTPException(status_code=500, detail="Internal error")
-    
-    if questao_usuario_resposta.resposta != esqueci_senha_request.questao_usuario_resposta:
+
+    if (
+        questao_usuario_resposta.resposta
+        != esqueci_senha_request.questao_usuario_resposta
+    ):
         raise HTTPException(status_code=400, detail="A resposta não confere")
-    
+
     print(usuario_existente.id)
     session.query(Usuario).filter(Usuario.id == usuario_existente.id).update(
         {
-            Usuario.senha: hashlib.md5(esqueci_senha_request.nova_senha.encode('utf-8')).hexdigest(),
+            Usuario.senha: hashlib.md5(
+                esqueci_senha_request.nova_senha.encode("utf-8")
+            ).hexdigest(),
         },
         synchronize_session=False,
     )
@@ -264,6 +272,7 @@ def get_usuario(id):
         )
     except:
         return None
+
 
 def get_usuario_by_email(email):
     session = database.get_db_session(engine)

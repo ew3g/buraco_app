@@ -141,17 +141,13 @@ const Mapa = () => {
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-12">
-                                    Deseja cadastrar um buraco aqui?
+                                    <span> Deseja cadastrar um buraco aqui?</span>
                                 </div>
+                                <br /><br />
                                 <div className="row">
                                     <div className="col-md-12">
-                                        Informe o tamanho do buraco:
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <select value={tamanhoBuracoSelecionado} onChange={handleTamanhoBuracoSelectChange}>
-                                            <option value="null">Selecione uma opção</option>
+                                        <select className="form-select" value={tamanhoBuracoSelecionado} onChange={handleTamanhoBuracoSelectChange}>
+                                            <option value="null">Tamanho do Buraco</option>
                                             {tamanhosBuraco.map(tamanhoBuraco => (
                                                 <option key={tamanhoBuraco.id} value={tamanhoBuraco.id}>
                                                     {tamanhoBuraco.nome}
@@ -161,6 +157,7 @@ const Mapa = () => {
                                     </div>
                                 </div>
                             </div>
+                            <br />
                             <div className="row">
                                 <div className="col-md-12">
                                     <button className="btn btn-primary" onClick={handleMarkerConfirm}>Confirmar</button>

@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from models.request import QuestaoRequest 
-from models.response import TamanhoBuracoListResponse, QuestaoResponse
-from models.models import Usuario, QuestaoUsuarioResposta
+from models.request import QuestaoRequest
+from models.response import (
+    TamanhoBuracoListResponse,
+    QuestaoResponse,
+    QuestaoListResponse,
+)
+from models.models import Usuario, QuestaoUsuarioResposta, QuestaoUsuario
 from db.database import Database
 from sqlalchemy import and_
 from auth.auth_bearer import JWTBearer
@@ -16,6 +20,13 @@ router = APIRouter(
 
 database = Database()
 engine = database.get_db_connection()
+
+
+@router.get("/", status_code=200)
+async def read_all_questao():
+    session = database.get_db_session(engine)
+    data = session.query(QuestaoUsuario).all()
+    return QuestaoListResponse(data)
 
 
 @router.post("/usuario", status_code=200)
@@ -35,7 +46,7 @@ async def read_questao_by_usuario(questao_req: QuestaoRequest):
         )
     except:
         usuario_existente = None
-    
+
     if not usuario_existente:
         raise HTTPException(status_code=404, detail="Not found")
 
@@ -52,5 +63,5 @@ async def read_questao_by_usuario(questao_req: QuestaoRequest):
         )
     except:
         raise HTTPException(status_code=404, detail="Not found")
-    
+
     return QuestaoResponse(questao_resposta_existente.questaoUsuario)

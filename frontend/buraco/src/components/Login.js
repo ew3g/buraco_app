@@ -96,7 +96,7 @@ const Login = () => {
                                 <a className='btn btn-primary' href='/novo-usuario'>Novo Usuário</a>
                             </div>
                             <div className='col-md-6'>
-                                <a className='btn btn-primary' href='/esqueci-senha'>Equeci minha senha</a>
+                                <a href='/esqueci-senha'>Esqueci minha senha</a>
                             </div>
                         </div>
                     </form>

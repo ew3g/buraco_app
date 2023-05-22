@@ -1,11 +1,8 @@
-import { React, useEffect, useState } from 'react';
+import { React, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { getUsuarioById, esqueciSenha } from '../api/usuario';
+import { esqueciSenha } from '../api/usuario';
 import { getQuestaoByEmail } from '../api/questao';
 import '../style/esqueci-senha.css'
-
-
-import AppNavbar from './Navbar';
 
 const EsqueciSenha = () => {
 
@@ -14,20 +11,16 @@ const EsqueciSenha = () => {
     const [questaoUsuarioResposta, setQuestaoUsuarioResposta] = useState('');
     const [novaSenha, setNovaSenha] = useState('');
     const [novaSenhaRepetida, setNovaSenhaRepetida] = useState('');
-    const [trocarSenhaError, setTrocarSenhaError] = useState(false);
-    const [trocarSenhaSucesso, setTrocarSenhaSucesso] = useState(false);
-    const [senhaIgualError, setSenhaIgualError] = useState(false);
     const [questaoUsuario, setQuestaoUsuario] = useState('');
-    const [usuarioNaoExisteError, setUsuarioNaoExisteError] = useState(false);
     const [info, setInfo] = useState('');
 
-    useEffect(() => {
-
-
-    }, []);
-
     const fetchQuestaoByEmail = async () => {
-        await getQuestaoByEmail(email).then(response => {
+
+        const request = {
+            "email": email,
+        }
+
+        await getQuestaoByEmail(request).then(response => {
             if (response.status === 200) {
                 setQuestaoUsuario(response.data.pergunta);
                 setInfo('');
@@ -44,18 +37,16 @@ const EsqueciSenha = () => {
     const handleTrocarSenha = async (e) => {
         e.preventDefault();
 
-        if (email == '' || novaSenha == '' || novaSenhaRepetida == '') {
+        setInfo('');
+
+        if (email === '' || novaSenha === '' || novaSenhaRepetida === '') {
             setInfo('Preencha todos os campos');
             return;
-        } else {
-            setInfo('');
         }
 
         if (novaSenha !== novaSenhaRepetida) {
             setInfo('As senhas não coincidem')
             return;
-        } else {
-            setInfo('');
         }
 
         const request = {
@@ -66,7 +57,7 @@ const EsqueciSenha = () => {
 
         await esqueciSenha(request).then(response => {
             console.log(response);
-            if (response.status == 200) {
+            if (response.status === 200) {
                 alert('Senha alterada com sucesso');
                 navigate('/');
             } else {
